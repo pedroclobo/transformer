@@ -3,6 +3,7 @@
 var currentCameraIndex = 0;
 
 var cameras = [], scene, renderer;
+var clock;
 
 var geometry, material, mesh;
 
@@ -186,6 +187,9 @@ function init() {
     createScene();
     createCameras();
 
+    clock = new THREE.Clock();
+    clock.start();
+
     render();
 
     window.addEventListener("keydown", onKeyDown);
@@ -195,6 +199,9 @@ function init() {
 function animate() {
     'use strict';
 
+    var delta = clock.getDelta();
+
+    // TODO: update positions based on delta
     if (ball.userData.jumping) {
         ball.userData.step += 0.04;
         ball.position.y = Math.abs(30 * (Math.sin(ball.userData.step)));
