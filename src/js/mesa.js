@@ -1,6 +1,8 @@
 /*global THREE, requestAnimationFrame, console*/
 
-var camera, scene, renderer;
+var currentCameraIndex = 0;
+
+var cameras = [], scene, renderer;
 
 var geometry, material, mesh;
 
@@ -64,6 +66,7 @@ function createScene() {
     'use strict';
 
     scene = new THREE.Scene();
+    scene.background = new THREE.Color('rgb(0, 170, 255)');
 
 
     scene.add(new THREE.AxisHelper(10));
@@ -72,16 +75,54 @@ function createScene() {
     createBall(0, 0, 15);
 }
 
-function createCamera() {
+function createCameras() {
     'use strict';
-    camera = new THREE.PerspectiveCamera(70,
+    var prespectivecamera = new THREE.PerspectiveCamera(70,
                                          window.innerWidth / window.innerHeight,
                                          1,
                                          1000);
-    camera.position.x = 50;
-    camera.position.y = 50;
-    camera.position.z = 50;
-    camera.lookAt(scene.position);
+    prespectivecamera.position.x = 50;
+    prespectivecamera.position.y = 50;
+    prespectivecamera.position.z = 50;
+    prespectivecamera.lookAt(scene.position);
+
+    var orthographicCamera = new THREE.OrthographicCamera(window.innerWidth / - 2,
+                                                            window.innerWidth / 2,
+                                                            window.innerHeight / 2,
+                                                            window.innerHeight / - 2,
+                                                            1,
+                                                            1000);
+    orthographicCamera.position.x = 50;
+    orthographicCamera.position.y = 50;
+    orthographicCamera.position.z = 50;
+    orthographicCamera.lookAt(scene.position);
+
+    // create top camera
+    var topCamera = new THREE.OrthographicCamera(window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -1000, 1000);
+    topCamera.position.x = 0;
+    topCamera.position.y = 100;
+    topCamera.position.z = 0;
+    topCamera.lookAt(scene.position);
+
+    // create side camera
+    var sideCamera = new THREE.OrthographicCamera(window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -1000, 1000);
+    sideCamera.position.x = 100;
+    sideCamera.position.y = 0;
+    sideCamera.position.z = 0;
+    sideCamera.lookAt(scene.position);
+    
+    // create front camera
+    var frontCamera = new THREE.OrthographicCamera(window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -1000, 1000);
+    frontCamera.position.x = 0;
+    frontCamera.position.y = 0;
+    frontCamera.position.z = 100;
+    frontCamera.lookAt(scene.position);
+
+    cameras.push(frontCamera);
+    cameras.push(sideCamera);
+    cameras.push(topCamera);
+    cameras.push(orthographicCamera);
+    cameras.push(prespectivecamera);
 }
 
 function onResize() {
@@ -90,8 +131,8 @@ function onResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     if (window.innerHeight > 0 && window.innerWidth > 0) {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+        cameras[currentCameraIndex].aspect = window.innerWidth / window.innerHeight;
+        camera[currentCameraIndex].updateProjectionMatrix();
     }
 
 }
@@ -99,6 +140,12 @@ function onResize() {
 function onKeyDown(e) {
     'use strict';
 
+    // Handle cameras
+    if (e.keyCode >= 49 && e.keyCode <= 53) { //1-5
+        currentCameraIndex = e.keyCode - 49;
+        return;
+    }
+    
     switch (e.keyCode) {
     case 65: //A
     case 97: //a
@@ -125,7 +172,7 @@ function onKeyDown(e) {
 
 function render() {
     'use strict';
-    renderer.render(scene, camera);
+    renderer.render(scene, cameras[currentCameraIndex]);
 }
 
 function init() {
@@ -137,7 +184,7 @@ function init() {
     document.body.appendChild(renderer.domElement);
 
     createScene();
-    createCamera();
+    createCameras();
 
     render();
 
