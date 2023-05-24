@@ -7,12 +7,21 @@ var cameras = [],
 	renderer;
 var clock;
 
-var geometry, material, mesh;
+var keys = {};
 
+var geometry, material, mesh;
+var head, neck, lEye, rEye, lAntenna, rAntenna, headObject;
+var chest, lPectoralis, rPectoralis, chestObject;
+var abdomen;
+var shoulder, forearm, arm, hand, botExhaust, topExhaust, LeftArmObject;
+var lFoot, rFoot;
+var waist, lwheel, rwheel, waistObject;
+var thigh, leg, topWheel, botWheel, legObject;
+
+var headContainer;
 
 function addHead(obj, x, y, z) {
 	"use strict";
-	var head, neck, lEye, rEye, lAntenna, rAntenna, headObject;
 
 	// head
 	material = new THREE.MeshBasicMaterial({ color: 0xffd91c, wireframe: true });
@@ -49,8 +58,6 @@ function addHead(obj, x, y, z) {
 
 function addChest(obj, x, y, z) {
 	"use strict";
-	var chest, lPectoralis, rPectoralis, chestObject;
-
 	// chest
 	material = new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true });
 	chest = new THREE.Mesh(new THREE.BoxGeometry(18, 16, 24), material);
@@ -75,7 +82,7 @@ function addAbdomen(obj, x, y, z) {
 	"use strict";
 	// abdomen
 	material = new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true });
-	var abdomen = new THREE.Mesh(new THREE.BoxGeometry(15.5, 8, 12), material);
+	abdomen = new THREE.Mesh(new THREE.BoxGeometry(15.5, 8, 12), material);
 
 	abdomen.position.set(x, y, z);
 
@@ -84,8 +91,6 @@ function addAbdomen(obj, x, y, z) {
 
 function addLeftArm(obj, x, y, z) {
 	"use strict";
-	var shoulder, forearm, arm, hand, botExhaust, topExhaust, LeftArmObject;
-
 	// shoulder
 	material = new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true });
 	shoulder = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 4), material);
@@ -107,12 +112,18 @@ function addLeftArm(obj, x, y, z) {
 
 	// bot exhaust
 	material = new THREE.MeshBasicMaterial({ color: 0x7a7a7a, wireframe: true });
-	botExhaust = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 12, 16), material);
+	botExhaust = new THREE.Mesh(
+		new THREE.CylinderGeometry(1.5, 1.5, 12, 16),
+		material
+	);
 	botExhaust.position.set(-3.5, 3.5, -3.5);
 
 	// top exhaust
 	material = new THREE.MeshBasicMaterial({ color: 0x9c9c9c, wireframe: true });
-	topExhaust = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 8, 16), material);
+	topExhaust = new THREE.Mesh(
+		new THREE.CylinderGeometry(1, 1, 8, 16),
+		material
+	);
 	topExhaust.position.set(-3.5, 13.5, -3.5);
 
 	// full arm
@@ -125,8 +136,6 @@ function addLeftArm(obj, x, y, z) {
 
 function addRightArm(obj, x, y, z) {
 	"use strict";
-	var shoulder, forearm, arm, hand, botExhaust, topExhaust, LeftArmObject;
-
 	// shoulder
 	material = new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true });
 	shoulder = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 4), material);
@@ -148,12 +157,18 @@ function addRightArm(obj, x, y, z) {
 
 	// bot exhaust
 	material = new THREE.MeshBasicMaterial({ color: 0x7a7a7a, wireframe: true });
-	botExhaust = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 12, 16), material);
+	botExhaust = new THREE.Mesh(
+		new THREE.CylinderGeometry(1.5, 1.5, 12, 16),
+		material
+	);
 	botExhaust.position.set(-3.5, 3.5, 3.5);
 
 	// top exhaust
 	material = new THREE.MeshBasicMaterial({ color: 0x9c9c9c, wireframe: true });
-	topExhaust = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 8, 16), material);
+	topExhaust = new THREE.Mesh(
+		new THREE.CylinderGeometry(1, 1, 8, 16),
+		material
+	);
 	topExhaust.position.set(-3.5, 13.5, 3.5);
 
 	// full arm
@@ -166,8 +181,6 @@ function addRightArm(obj, x, y, z) {
 
 function addWaist(obj, x, y, z) {
 	"use strict";
-	var waist, lwheel, rwheel, waistObject;
-
 	// waist
 	material = new THREE.MeshBasicMaterial({ color: 0xffd91c, wireframe: true });
 	waist = new THREE.Mesh(new THREE.BoxGeometry(12, 8, 24), material);
@@ -256,22 +269,22 @@ function addLeftFoot(obj, x, y, z) {
 	"use strict";
 	// foot
 	material = new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true });
-	var foot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), material);
+	lFoot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), material);
 
-	foot.position.set(x, y, z);
+	lFoot.position.set(x, y, z);
 
-	obj.add(foot);
+	obj.add(lFoot);
 }
 
 function addRightFoot(obj, x, y, z) {
 	"use strict";
 	// foot
 	material = new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true });
-	var foot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), material);
+	rFoot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), material);
 
-	foot.position.set(x, y, z);
+	rFoot.position.set(x, y, z);
 
-	obj.add(foot);
+	obj.add(rFoot);
 }
 
 function createTransformer(x, y, z) {
@@ -307,20 +320,32 @@ function createScene() {
 }
 
 function createOrthographicCamera(x, y, z) {
-    'use strict';
-    var ratio = window.innerWidth / window.innerHeight;
-    var newCamera = new THREE.OrthographicCamera(-50 * ratio, 50 * ratio, 50, -50, 1, 1000);
-    newCamera.position.set(x, y, z);
-    newCamera.lookAt(scene.position);
-    return newCamera;
+	"use strict";
+	var ratio = window.innerWidth / window.innerHeight;
+	var newCamera = new THREE.OrthographicCamera(
+		-50 * ratio,
+		50 * ratio,
+		50,
+		-50,
+		1,
+		1000
+	);
+	newCamera.position.set(x, y, z);
+	newCamera.lookAt(scene.position);
+	return newCamera;
 }
 
 function createPerspectiveCamera(x, y, z) {
-    'use strict';
-    var newCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
-    newCamera.position.set(x, y, z);
-    newCamera.lookAt(scene.position);
-    return newCamera;
+	"use strict";
+	var newCamera = new THREE.PerspectiveCamera(
+		70,
+		window.innerWidth / window.innerHeight,
+		1,
+		1000
+	);
+	newCamera.position.set(x, y, z);
+	newCamera.lookAt(scene.position);
+	return newCamera;
 }
 
 function createCameras() {
@@ -331,7 +356,13 @@ function createCameras() {
 	var orthographicCamera = createOrthographicCamera(50, 50, 50);
 	var prespectiveCamera = createPerspectiveCamera(50, 50, 50);
 
-	cameras.push(frontCamera, sideCamera, topCamera, orthographicCamera, prespectiveCamera);
+	cameras.push(
+		frontCamera,
+		sideCamera,
+		topCamera,
+		orthographicCamera,
+		prespectiveCamera
+	);
 }
 
 function onResize() {
@@ -341,7 +372,7 @@ function onResize() {
 
 	if (window.innerHeight > 0 && window.innerWidth > 0) {
 		cameras[currentCameraIndex].aspect = window.innerWidth / window.innerHeight;
-		camera[currentCameraIndex].updateProjectionMatrix();
+		cameras[currentCameraIndex].updateProjectionMatrix();
 	}
 }
 
@@ -357,24 +388,22 @@ function onKeyDown(e) {
 
 	switch (e.keyCode) {
 		// control wireframe
-		case 65: //A
-		case 97: //a
+		case 90: //Z
 			scene.traverse(function (node) {
 				if (node instanceof THREE.Mesh) {
 					node.material.wireframe = !node.material.wireframe;
 				}
 			});
 			break;
-		// show or hide axis
-		case 69: //E
-		case 101: //e
-			scene.traverse(function (node) {
-				if (node instanceof THREE.AxisHelper) {
-					node.visible = !node.visible;
-				}
-			});
-			break;
+		default:
+			keys[e.keyCode] = 1;
 	}
+}
+
+function onKeyUp(e) {
+	"use strict";
+
+	keys[e.keyCode] = 0;
 }
 
 function render() {
@@ -399,7 +428,106 @@ function init() {
 	render();
 
 	window.addEventListener("keydown", onKeyDown);
+	window.addEventListener("keyup", onKeyUp);
 	window.addEventListener("resize", onResize);
+}
+
+function rotateHead(up) {
+	const maxRotation = Math.PI / 2; // 90 degrees in radians
+	if (up && headObject.rotation.z < maxRotation) {
+		headObject.rotation.z += 0.05;
+		if (headObject.rotation.z > maxRotation) {
+			headObject.rotation.z = maxRotation;
+		}
+	} else if (!up && headObject.rotation.z > -maxRotation) {
+		headObject.rotation.z -= 0.05;
+		if (headObject.rotation.z < -maxRotation) {
+			headObject.rotation.z = -maxRotation;
+		}
+	}
+}
+
+function rotateFeet(up) {
+	const maxRotation = Math.PI / 2; // 90 degrees in radians
+	if (up && lFoot.rotation.z < maxRotation && rFoot.rotation.z < maxRotation) {
+		lFoot.rotation.z += 0.05;
+		rFoot.rotation.z += 0.05;
+		if (lFoot.rotation.z > maxRotation) {
+			lFoot.rotation.z = maxRotation;
+		}
+		if (rFoot.rotation.z > maxRotation) {
+			rFoot.rotation.z = maxRotation;
+		}
+	} else if (
+		!up &&
+		lFoot.rotation.z > -maxRotation &&
+		rFoot.rotation.z > -maxRotation
+	) {
+		lFoot.rotation.z -= 0.05;
+		rFoot.rotation.z -= 0.05;
+		if (lFoot.rotation.z < -maxRotation) {
+			lFoot.rotation.z = -maxRotation;
+		}
+		if (rFoot.rotation.z < -maxRotation) {
+			rFoot.rotation.z = -maxRotation;
+		}
+	}
+}
+
+function moveArms(left) {
+	// FIXME
+}
+
+function rotateWaist(up) {
+	const maxRotation = Math.PI / 2; // 90 degrees in radians
+	if (up && waistObject.rotation.z < maxRotation) {
+		waistObject.rotation.z += 0.05;
+		if (waistObject.rotation.z > maxRotation) {
+			waistObject.rotation.z = maxRotation;
+		}
+	} else if (!up && waistObject.rotation.z > -maxRotation) {
+		waistObject.rotation.z -= 0.05;
+		if (waistObject.rotation.z < -maxRotation) {
+			waistObject.rotation.z = -maxRotation;
+		}
+	}
+}
+
+function update() {
+	"use strict";
+
+	if (keys[81] == 1) {
+		console.log("Q");
+		rotateFeet(true);
+	}
+	if (keys[65] == 1) {
+		console.log("A");
+		rotateFeet(false);
+	}
+	if (keys[87] == 1) {
+		console.log("W");
+		rotateWaist(true);
+	}
+	if (keys[83] == 1) {
+		console.log("S");
+		rotateWaist(false);
+	}
+	if (keys[69] == 1) {
+		console.log("E");
+		moveArms(true);
+	}
+	if (keys[68] == 1) {
+		console.log("D");
+		moveArms(false);
+	}
+	if (keys[82] == 1) {
+		console.log("R");
+		rotateHead(true);
+	}
+	if (keys[70] == 1) {
+		console.log("F");
+		rotateHead(false);
+	}
 }
 
 function animate() {
@@ -408,7 +536,7 @@ function animate() {
 	var delta = clock.getDelta();
 
 	// TODO: update positions based on delta
+	update();
 	render();
-
 	requestAnimationFrame(animate);
 }
