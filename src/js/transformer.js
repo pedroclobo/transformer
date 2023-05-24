@@ -9,24 +9,6 @@ var clock;
 
 var geometry, material, mesh;
 
-var ball;
-
-
-function createBall(x, y, z) {
-	"use strict";
-
-	ball = new THREE.Object3D();
-	ball.userData = { jumping: true, step: 0 };
-
-	material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
-	geometry = new THREE.SphereGeometry(4, 10, 10);
-	mesh = new THREE.Mesh(geometry, material);
-
-	ball.add(mesh);
-	ball.position.set(x, y, z);
-
-	scene.add(ball);
-}
 
 function addHead(obj, x, y, z) {
 	"use strict";
@@ -318,10 +300,9 @@ function createScene() {
 
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color("rgb(0, 170, 255)");
-	
+
 	scene.add(new THREE.AxisHelper(10));
 
-	createBall(0, 0, 15);
 	createTransformer(0, 10, 0);
 }
 
@@ -355,7 +336,7 @@ function createCameras() {
 
 function onResize() {
 	"use strict";
-	
+
 	renderer.setSize(window.innerWidth, window.innerHeight);
 
 	if (window.innerHeight > 0 && window.innerWidth > 0) {
@@ -383,10 +364,6 @@ function onKeyDown(e) {
 					node.material.wireframe = !node.material.wireframe;
 				}
 			});
-			break;
-		case 83: //S
-		case 115: //s
-			ball.userData.jumping = !ball.userData.jumping;
 			break;
 		// show or hide axis
 		case 69: //E
@@ -431,11 +408,6 @@ function animate() {
 	var delta = clock.getDelta();
 
 	// TODO: update positions based on delta
-	if (ball.userData.jumping) {
-		ball.userData.step += 0.04;
-		ball.position.y = Math.abs(30 * Math.sin(ball.userData.step));
-		ball.position.z = 15 * Math.cos(ball.userData.step);
-	}
 	render();
 
 	requestAnimationFrame(animate);
