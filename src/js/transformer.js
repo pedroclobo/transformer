@@ -351,19 +351,15 @@ function onKeyDown(e) {
 	if (e.keyCode >= 49 && e.keyCode <= 53) {
 		// 1-5
 		currentCameraIndex = e.keyCode - 49;
-		return;
 	}
-
-	switch (e.keyCode) {
-		// toggle wireframe
-		case 90: //Z
-			for (let material of materials.values()) {
-				material.wireframe = !material.wireframe;
-			}
-			break;
-		default:
-			keys[e.keyCode] = 1;
+	// Toggle wireframe
+	else if (e.keyCode == 54) {
+		// 6
+		for (let material of materials.values()) {
+			material.wireframe = !material.wireframe;
+		}
 	}
+	else keys[e.keyCode] = 1;
 }
 
 function onKeyUp(e) {
