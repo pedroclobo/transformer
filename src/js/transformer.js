@@ -443,121 +443,102 @@ function init() {
 	window.addEventListener("resize", onResize, false);
 }
 
-function rotateHead(up) {
+function rotateHead(up, delta) {
 	var pivot = new THREE.Vector3(-2, 17.5, 0);
 	var axis = new THREE.Vector3(0, 0, 1);
+	var velocity = delta * Math.PI;
 
 	if (up && headObject.rotation.z < Math.PI) {
-		headObject.rotateOnWorldAxis(axis, Math.PI / 32);
-		headObject.position
-			.sub(pivot)
-			.applyAxisAngle(axis, Math.PI / 32)
-			.add(pivot);
+		headObject.rotateOnWorldAxis(axis, velocity);
+		headObject.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
 	} else if (!up && headObject.rotation.z > 0) {
-		headObject.rotateOnWorldAxis(axis, -Math.PI / 32);
-		headObject.position
-			.sub(pivot)
-			.applyAxisAngle(axis, -Math.PI / 32)
-			.add(pivot);
+		headObject.rotateOnWorldAxis(axis, -velocity);
+		headObject.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
 	}
 }
 
-function rotateFeet(up) {
+function rotateFeet(up, delta) {
 	var pivot = new THREE.Vector3(-3, -44, 0);
 	var axis = new THREE.Vector3(0, 0, 1);
+	var velocity = delta * Math.PI;
 
 	if (up && lFoot.rotation.z < 0 && rFoot.rotation.z < 0) {
-		lFoot.rotateOnWorldAxis(axis, Math.PI / 32);
-		lFoot.position
-			.sub(pivot)
-			.applyAxisAngle(axis, Math.PI / 32)
-			.add(pivot);
-		rFoot.rotateOnWorldAxis(axis, Math.PI / 32);
-		rFoot.position
-			.sub(pivot)
-			.applyAxisAngle(axis, Math.PI / 32)
-			.add(pivot);
+		lFoot.rotateOnWorldAxis(axis, velocity);
+		lFoot.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
+		rFoot.rotateOnWorldAxis(axis, velocity);
+		rFoot.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
 	} else if (
 		!up &&
 		lFoot.rotation.z > -Math.PI / 2 &&
 		rFoot.rotation.z > -Math.PI / 2
 	) {
-		lFoot.rotateOnWorldAxis(axis, -Math.PI / 32);
-		rFoot.rotateOnWorldAxis(axis, -Math.PI / 32);
-		rFoot.position
-			.sub(pivot)
-			.applyAxisAngle(axis, -Math.PI / 32)
-			.add(pivot);
-		lFoot.position
-			.sub(pivot)
-			.applyAxisAngle(axis, -Math.PI / 32)
-			.add(pivot);
+		lFoot.rotateOnWorldAxis(axis, -velocity);
+		rFoot.rotateOnWorldAxis(axis, -velocity);
+		rFoot.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
+		lFoot.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
 	}
 }
 
-function moveArms(left) {
+function moveArms(left, delta) {
+	var velocity = new THREE.Vector3(0, 0, 10).multiplyScalar(delta);
+
 	if (left) {
-		LeftArmObject.position.add(new THREE.Vector3(0, 0, 1));
-		RightArmObject.position.sub(new THREE.Vector3(0, 0, 1));
+		LeftArmObject.position.add(velocity);
+		RightArmObject.position.sub(velocity);
 	} else if (!left) {
-		LeftArmObject.position.sub(new THREE.Vector3(0, 0, 1));
-		RightArmObject.position.add(new THREE.Vector3(0, 0, 1));
+		LeftArmObject.position.sub(velocity);
+		RightArmObject.position.add(velocity);
 	}
 }
 
-function rotateWaist(up) {
+function rotateWaist(up, delta) {
 	var pivot = new THREE.Vector3(-1, -6, 0);
 	var axis = new THREE.Vector3(0, 0, 1);
+	var velocity = delta * Math.PI;
 
 	if (up && lowerBody.rotation.z < 0) {
-		lowerBody.rotateOnWorldAxis(axis, Math.PI / 32);
-		lowerBody.position
-			.sub(pivot)
-			.applyAxisAngle(axis, Math.PI / 32)
-			.add(pivot);
+		lowerBody.rotateOnWorldAxis(axis, velocity);
+		lowerBody.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
 	} else if (!up && lowerBody.rotation.z > -Math.PI) {
-		lowerBody.rotateOnWorldAxis(axis, -Math.PI / 32);
-		lowerBody.position
-			.sub(pivot)
-			.applyAxisAngle(axis, -Math.PI / 32)
-			.add(pivot);
+		lowerBody.rotateOnWorldAxis(axis, -velocity);
+		lowerBody.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
 	}
 }
 
-function update() {
+function update(delta) {
 	"use strict";
 
 	if (keys[81] == 1) {
 		console.log("Q");
-		rotateFeet(true);
+		rotateFeet(true, delta);
 	}
 	if (keys[65] == 1) {
 		console.log("A");
-		rotateFeet(false);
+		rotateFeet(false, delta);
 	}
 	if (keys[87] == 1) {
 		console.log("W");
-		rotateWaist(true);
+		rotateWaist(true, delta);
 	}
 	if (keys[83] == 1) {
 		console.log("S");
-		rotateWaist(false);
+		rotateWaist(false, delta);
 	}
 	if (keys[69] == 1) {
 		console.log("E");
-		moveArms(true);
+		moveArms(true, delta);
 	}
 	if (keys[68] == 1) {
 		console.log("D");
-		moveArms(false);
+		moveArms(false, delta);
 	}
 	if (keys[82] == 1) {
 		console.log("R");
-		rotateHead(true);
+		rotateHead(true, delta);
 	}
 	if (keys[70] == 1) {
 		console.log("F");
-		rotateHead(false);
+		rotateHead(false, delta);
 	}
 }
 
@@ -565,9 +546,9 @@ function animate() {
 	"use strict";
 
 	var delta = clock.getDelta();
+	console.log(delta);
 
-	// TODO: update positions based on delta
-	update();
+	update(delta);
 	render();
 	requestAnimationFrame(animate);
 }
