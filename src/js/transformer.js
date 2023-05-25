@@ -1,14 +1,15 @@
 /*global THREE, requestAnimationFrame, console*/
 
-var currentCameraIndex = 0;
-
 var cameras = [],
 	scene,
-	renderer;
+	renderer,
+	clock;
 
-var clock;
+var currentCameraIndex = 0,
+	delta = 0;
 
 var keys = {};
+
 let materials = new Map([
 	['yellow', new THREE.MeshBasicMaterial({ color: 0xffd91c, wireframe: true })],
 	['orange', new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true })],
@@ -20,25 +21,22 @@ let materials = new Map([
 	['darkGray', new THREE.MeshBasicMaterial({ color: 0x242424, wireframe: true })]
   ]);
 
-var head, neck, lEye, rEye, lAntenna, rAntenna, headObject;
-var chest, lPectoralis, rPectoralis, chestObject;
-var abdomen;
-var shoulder,
-	forearm,
-	arm,
-	hand,
-	botExhaust,
-	topExhaust,
-	LeftArmObject,
-	RightArmObject;
-var lFoot, rFoot;
-var waist, lwheel, rwheel, waistObject;
-var thigh, leg, topWheel, botWheel, legObject;
+var transformer,
+  	lowerBody,
+	feet;
 
-var lowerBody;
+var headObject,
+	chestObject,
+	abdomen,
+	leftArmObject,
+	rightArmObject,
+	waistObject,
+	legObject;
 
-function addHead(x, y, z) {
+
+function createHead(x, y, z) {
 	"use strict";
+	var head, neck, lEye, rEye, lAntenna, rAntenna;
 
 	// head
 	head = new THREE.Mesh(new THREE.SphereGeometry(4, 32, 16), materials.get("yellow"));
@@ -69,8 +67,10 @@ function addHead(x, y, z) {
 	return headObject;
 }
 
-function addChest(x, y, z) {
+function createChest(x, y, z) {
 	"use strict";
+	var chest, lPectoralis, rPectoralis;
+
 	// chest
 	chest = new THREE.Mesh(new THREE.BoxGeometry(18, 16, 24), materials.get("red"));
 
@@ -88,7 +88,7 @@ function addChest(x, y, z) {
 	return chestObject;
 }
 
-function addAbdomen(x, y, z) {
+function createAbdomen(x, y, z) {
 	"use strict";
 	// abdomen
 	abdomen = new THREE.Mesh(new THREE.BoxGeometry(15.5, 8, 12), materials.get("darkOrange"));
@@ -97,8 +97,10 @@ function addAbdomen(x, y, z) {
 	return abdomen;
 }
 
-function addLeftArm(x, y, z) {
+function createLeftArm(x, y, z) {
 	"use strict";
+	var shoulder, forearm, arm, hand, botExhaust, topExhaust;
+
 	// shoulder
 	shoulder = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 4), materials.get("darkOrange"));
 
@@ -123,15 +125,17 @@ function addLeftArm(x, y, z) {
 	topExhaust.position.set(-3.5, 13.5, -3.5);
 
 	// full arm
-	LeftArmObject = new THREE.Object3D();
-	LeftArmObject.add(shoulder, forearm, arm, botExhaust, topExhaust, hand);
-	LeftArmObject.position.set(x, y, z);
+	leftArmObject = new THREE.Object3D();
+	leftArmObject.add(shoulder, forearm, arm, botExhaust, topExhaust, hand);
+	leftArmObject.position.set(x, y, z);
 
-	return LeftArmObject;
+	return leftArmObject;
 }
 
-function addRightArm(x, y, z) {
+function createRightArm(x, y, z) {
 	"use strict";
+	var shoulder, forearm, arm, hand, botExhaust, topExhaust;
+
 	// shoulder
 	shoulder = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 4), materials.get("darkOrange"));
 
@@ -156,16 +160,18 @@ function addRightArm(x, y, z) {
 	topExhaust.position.set(-3.5, 13.5, 3.5);
 
 	// full arm
-	RightArmObject = new THREE.Object3D();
-	RightArmObject.add(shoulder, forearm, arm, botExhaust, topExhaust, hand);
-	RightArmObject.position.set(x, y, z);
+	rightArmObject = new THREE.Object3D();
+	rightArmObject.add(shoulder, forearm, arm, botExhaust, topExhaust, hand);
+	rightArmObject.position.set(x, y, z);
 
-	return RightArmObject;
+	return rightArmObject;
 }
 
-function addWaist(x, y, z) {
+function createWaist(x, y, z) {
 	"use strict";
 	// waist
+	var waist, lwheel, rwheel;
+
 	waist = new THREE.Mesh(new THREE.BoxGeometry(12, 8, 24), materials.get("yellow"));
 
 	// wheels
@@ -184,9 +190,9 @@ function addWaist(x, y, z) {
 	return waistObject;
 }
 
-function addLeftLeg(x, y, z) {
+function createLeftLeg(x, y, z) {
 	"use strict";
-	var thigh, leg, topWheel, botWheel, legObject;
+	var thigh, leg, topWheel, botWheel;
 
 	// thigh
 	thigh = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 8), materials.get("red"));
@@ -211,9 +217,9 @@ function addLeftLeg(x, y, z) {
 	return legObject;
 }
 
-function addRightLeg(x, y, z) {
+function createRightLeg(x, y, z) {
 	"use strict";
-	var thigh, leg, topWheel, botWheel, legObject;
+	var thigh, leg, topWheel, botWheel;
 
 	// thigh
 	thigh = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 8), materials.get("red"));
@@ -238,20 +244,19 @@ function addRightLeg(x, y, z) {
 	return legObject;
 }
 
-function addLeftFoot(x, y, z) {
+function createLeftFoot(x, y, z) {
 	"use strict";
 	// foot
-	lFoot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), materials.get("red"));
-
+	var lFoot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), materials.get("red"));
 	lFoot.position.set(x, y, z);
 
 	return lFoot;
 }
 
-function addRightFoot(x, y, z) {
+function createRightFoot(x, y, z) {
 	"use strict";
 	// foot
-	rFoot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), materials.get("red"));
+	var rFoot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), materials.get("red"));
 	rFoot.position.set(x, y, z);
 
 	return rFoot;
@@ -260,23 +265,32 @@ function addRightFoot(x, y, z) {
 function createTransformer(x, y, z) {
 	"use strict";
 
-	var transformer = new THREE.Object3D();
+	transformer = new THREE.Object3D();
 	lowerBody = new THREE.Object3D();
+	feet = new THREE.Object3D();
 
-	transformer.add(addHead(-2, 21, 0));
-	transformer.add(addChest(-2, 10, 0));
-	transformer.add(addAbdomen(0, 0, 0));
-	transformer.add(addLeftArm(-6.5, 12.5, -14));
-	transformer.add(addRightArm(-6.5, 12.5, 14));
-	lowerBody.add(addWaist(-5, -6, 0));
-	lowerBody.add(addLeftLeg(-4, -14, -8));
-	lowerBody.add(addRightLeg(-4, -14, 8));
-	lowerBody.add(addLeftFoot(-1, -44, -8));
-	lowerBody.add(addRightFoot(-1, -44, 8));
+	feet.add(
+		createLeftFoot(-1, -44, -8), 
+		createRightFoot(-1, -44, 8)
+	);
 
-	transformer.add(lowerBody);
+	lowerBody.add(
+		createWaist(-5, -6, 0), 
+		createLeftLeg(-4, -14, -8), 
+		createRightLeg(-4, -14, 8), 
+		feet
+	);
+	
+	transformer.add(
+		createHead(-2, 21, 0), 
+		createChest(-2, 10, 0), 
+		createAbdomen(0, 0, 0), 
+		createLeftArm(-6.5, 12.5, -14), 
+		createRightArm(-6.5, 12.5, 14), 
+		lowerBody
+	);
+
 	transformer.position.set(x, y, z);
-
 	scene.add(transformer);
 }
 
@@ -292,14 +306,7 @@ function createScene() {
 function createOrthographicCamera(x, y, z) {
 	"use strict";
 	var ratio = window.innerWidth / window.innerHeight;
-	var newCamera = new THREE.OrthographicCamera(
-		-50 * ratio,
-		50 * ratio,
-		50,
-		-50,
-		1,
-		1000
-	);
+	var newCamera = new THREE.OrthographicCamera(-50 * ratio, 50 * ratio, 50, -50, 1, 1000);
 	newCamera.position.set(x, y, z);
 	newCamera.lookAt(scene.position);
 	return newCamera;
@@ -307,12 +314,7 @@ function createOrthographicCamera(x, y, z) {
 
 function createPerspectiveCamera(x, y, z) {
 	"use strict";
-	var newCamera = new THREE.PerspectiveCamera(
-		70,
-		window.innerWidth / window.innerHeight,
-		1,
-		1000
-	);
+	var newCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
 	newCamera.position.set(x, y, z);
 	newCamera.lookAt(scene.position);
 	return newCamera;
@@ -346,7 +348,6 @@ function onResize() {
 
 function onKeyDown(e) {
 	"use strict";
-
 	// Handle cameras
 	if (e.keyCode >= 49 && e.keyCode <= 53) {
 		// 1-5
@@ -364,7 +365,6 @@ function onKeyDown(e) {
 
 function onKeyUp(e) {
 	"use strict";
-
 	keys[e.keyCode] = 0;
 }
 
@@ -375,9 +375,7 @@ function render() {
 
 function init() {
 	"use strict";
-	renderer = new THREE.WebGLRenderer({
-		antialias: true,
-	});
+	renderer = new THREE.WebGLRenderer({ antialias: true });
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 
@@ -394,7 +392,7 @@ function init() {
 	window.addEventListener("resize", onResize, false);
 }
 
-function rotateHead(up, delta) {
+function rotateHead(up) {
 	var pivot = new THREE.Vector3(-2, 17.4, 0);
 	var axis = new THREE.Vector3(0, 0, 1);
 	var velocity = delta * Math.PI;
@@ -416,56 +414,65 @@ function rotateHead(up, delta) {
 	}
 }
 
-function rotateFeet(up, delta) {
+function rotateFeet(up) {
 	var pivot = new THREE.Vector3(-3, -44, 0);
 	var axis = new THREE.Vector3(0, 0, 1);
 	var velocity = delta * Math.PI;
 
-	if (up && (lFoot.rotation.z < 0 || rFoot.rotation.z < 0)) {
-		lFoot.rotation.z = THREE.MathUtils.clamp(
-			lFoot.rotation.z + velocity,
-			-Math.PI / 2,
-			0
-		);
-		lFoot.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
-		rFoot.rotation.z = THREE.MathUtils.clamp(
-			rFoot.rotation.z + velocity,
-			-Math.PI / 2,
-			0
-		);
-		rFoot.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
-	} else if (
-		!up &&
-		(lFoot.rotation.z > -Math.PI / 2 || rFoot.rotation.z > -Math.PI / 2)
-	) {
-		lFoot.rotation.z = THREE.MathUtils.clamp(
-			lFoot.rotation.z - velocity,
-			-Math.PI / 2,
-			0
-		);
-		lFoot.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
-		rFoot.rotation.z = THREE.MathUtils.clamp(
-			rFoot.rotation.z - velocity,
-			-Math.PI / 2,
-			0
-		);
-		rFoot.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
+	if (up && feet.rotation.z < 0) {
+		feet.rotation.z = THREE.MathUtils.clamp(feet.rotation.z + velocity, -Math.PI / 2, 0);
+		feet.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
 	}
+	else if (!up && feet.rotation.z > -Math.PI / 2) {
+		feet.rotation.z = THREE.MathUtils.clamp(feet.rotation.z - velocity, -Math.PI / 2, 0);
+		feet.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
+	}
+
+	// if (up && (lFoot.rotation.z < 0 || rFoot.rotation.z < 0)) {
+	// 	lFoot.rotation.z = THREE.MathUtils.clamp(
+	// 		lFoot.rotation.z + velocity,
+	// 		-Math.PI / 2,
+	// 		0
+	// 	);
+	// 	lFoot.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
+	// 	rFoot.rotation.z = THREE.MathUtils.clamp(
+	// 		rFoot.rotation.z + velocity,
+	// 		-Math.PI / 2,
+	// 		0
+	// 	);
+	// 	rFoot.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
+	// } else if (
+	// 	!up &&
+	// 	(lFoot.rotation.z > -Math.PI / 2 || rFoot.rotation.z > -Math.PI / 2)
+	// ) {
+	// 	lFoot.rotation.z = THREE.MathUtils.clamp(
+	// 		lFoot.rotation.z - velocity,
+	// 		-Math.PI / 2,
+	// 		0
+	// 	);
+	// 	lFoot.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
+	// 	rFoot.rotation.z = THREE.MathUtils.clamp(
+	// 		rFoot.rotation.z - velocity,
+	// 		-Math.PI / 2,
+	// 		0
+	// 	);
+	// 	rFoot.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
+	// }
 }
 
-function moveArms(left, delta) {
+function moveArms(left) {
 	var velocity = new THREE.Vector3(0, 0, 10).multiplyScalar(delta);
 
 	if (left) {
-		LeftArmObject.position.add(velocity);
-		RightArmObject.position.sub(velocity);
+		leftArmObject.position.add(velocity);
+		rightArmObject.position.sub(velocity);
 	} else if (!left) {
-		LeftArmObject.position.sub(velocity);
-		RightArmObject.position.add(velocity);
+		leftArmObject.position.sub(velocity);
+		rightArmObject.position.add(velocity);
 	}
 }
 
-function rotateWaist(up, delta) {
+function rotateWaist(up) {
 	var pivot = new THREE.Vector3(-1, -6, 0);
 	var axis = new THREE.Vector3(0, 0, 1);
 	var velocity = delta * Math.PI;
@@ -487,49 +494,48 @@ function rotateWaist(up, delta) {
 	}
 }
 
-function update(delta) {
+function update() {
 	"use strict";
 
 	if (keys[81] == 1) {
 		console.log("Q");
-		rotateFeet(true, delta);
+		rotateFeet(true);
 	}
 	if (keys[65] == 1) {
 		console.log("A");
-		rotateFeet(false, delta);
+		rotateFeet(false);
 	}
 	if (keys[87] == 1) {
 		console.log("W");
-		rotateWaist(true, delta);
+		rotateWaist(true);
 	}
 	if (keys[83] == 1) {
 		console.log("S");
-		rotateWaist(false, delta);
+		rotateWaist(false);
 	}
 	if (keys[69] == 1) {
 		console.log("E");
-		moveArms(true, delta);
+		moveArms(true);
 	}
 	if (keys[68] == 1) {
 		console.log("D");
-		moveArms(false, delta);
+		moveArms(false);
 	}
 	if (keys[82] == 1) {
 		console.log("R");
-		rotateHead(true, delta);
+		rotateHead(true);
 	}
 	if (keys[70] == 1) {
 		console.log("F");
-		rotateHead(false, delta);
+		rotateHead(false);
 	}
 }
 
 function animate() {
 	"use strict";
 
-	var delta = clock.getDelta();
-
-	update(delta);
+	delta = clock.getDelta();
+	update();
 	render();
 	requestAnimationFrame(animate);
 }
