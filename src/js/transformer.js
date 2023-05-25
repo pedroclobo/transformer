@@ -427,37 +427,6 @@ function rotateFeet(up) {
 		feet.rotation.z = THREE.MathUtils.clamp(feet.rotation.z - velocity, -Math.PI / 2, 0);
 		feet.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
 	}
-
-	// if (up && (lFoot.rotation.z < 0 || rFoot.rotation.z < 0)) {
-	// 	lFoot.rotation.z = THREE.MathUtils.clamp(
-	// 		lFoot.rotation.z + velocity,
-	// 		-Math.PI / 2,
-	// 		0
-	// 	);
-	// 	lFoot.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
-	// 	rFoot.rotation.z = THREE.MathUtils.clamp(
-	// 		rFoot.rotation.z + velocity,
-	// 		-Math.PI / 2,
-	// 		0
-	// 	);
-	// 	rFoot.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
-	// } else if (
-	// 	!up &&
-	// 	(lFoot.rotation.z > -Math.PI / 2 || rFoot.rotation.z > -Math.PI / 2)
-	// ) {
-	// 	lFoot.rotation.z = THREE.MathUtils.clamp(
-	// 		lFoot.rotation.z - velocity,
-	// 		-Math.PI / 2,
-	// 		0
-	// 	);
-	// 	lFoot.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
-	// 	rFoot.rotation.z = THREE.MathUtils.clamp(
-	// 		rFoot.rotation.z - velocity,
-	// 		-Math.PI / 2,
-	// 		0
-	// 	);
-	// 	rFoot.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
-	// }
 }
 
 function moveArms(left) {
