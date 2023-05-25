@@ -324,11 +324,6 @@ function createScene() {
 
 	scene.add(new THREE.GridHelper(100, 10));
 
-	material = new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true });
-	var cube = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), material);
-	cube.position.set(0, -6, -14);
-	scene.add(cube);
-
 	createTransformer(0, 0, 0);
 }
 
