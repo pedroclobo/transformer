@@ -10,16 +10,19 @@ var currentCameraIndex = 0,
 
 var keys = {};
 
-let materials = new Map([
+var materials = new Map([
 	['yellow', new THREE.MeshBasicMaterial({ color: 0xffd91c, wireframe: true })],
 	['orange', new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true })],
 	['darkOrange', new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true })],
 	['red', new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true })],
 	['lightBlue', new THREE.MeshBasicMaterial({ color: 0xa8eeff, wireframe: true })],
 	['gray', new THREE.MeshBasicMaterial({ color: 0x7a7a7a, wireframe: true })],
-	['lightGray', new THREE.MeshBasicMaterial({ color: 0x9c9c9c, wireframe: true })],
+	['lightGray', new THREE.MeshBasicMaterial({ color: 0xacacac, wireframe: true })],
 	['darkGray', new THREE.MeshBasicMaterial({ color: 0x242424, wireframe: true })]
   ]);
+
+var geometry,
+  	line;
 
 var transformer,
   	lowerBody,
@@ -33,6 +36,9 @@ var headObject,
 	waistObject,
 	legObject;
 
+var trailer;
+
+//-----------------------------------------------------//
 
 function createHead(x, y, z) {
 	"use strict";
@@ -72,7 +78,10 @@ function createChest(x, y, z) {
 	var chest, lPectoralis, rPectoralis;
 
 	// chest
-	chest = new THREE.Mesh(new THREE.BoxGeometry(18, 16, 24), materials.get("red"));
+	geometry = new THREE.BoxGeometry(18, 16, 24);
+	chest = new THREE.Mesh(geometry, materials.get("red"));
+	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	chest.add(line);
 
 	// pectoralis
 	lPectoralis = new THREE.Mesh(new THREE.BoxGeometry(0.5, 7, 9), materials.get("lightBlue"));
@@ -91,7 +100,11 @@ function createChest(x, y, z) {
 function createAbdomen(x, y, z) {
 	"use strict";
 	// abdomen
-	abdomen = new THREE.Mesh(new THREE.BoxGeometry(15.5, 8, 12), materials.get("darkOrange"));
+
+	geometry = new THREE.BoxGeometry(15.5, 8, 12);
+	abdomen = new THREE.Mesh(geometry, materials.get("lightGray"));
+	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	abdomen.add(line);
 	abdomen.position.set(x, y, z);
 
 	return abdomen;
@@ -172,8 +185,11 @@ function createWaist(x, y, z) {
 	// waist
 	var waist, lwheel, rwheel;
 
-	waist = new THREE.Mesh(new THREE.BoxGeometry(12, 8, 24), materials.get("yellow"));
-
+	geometry = new THREE.BoxGeometry(12, 8, 23.75);
+	waist = new THREE.Mesh(geometry, materials.get("gray"));
+	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	waist.add(line);
+	
 	// wheels
 	lwheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
 	rwheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
@@ -195,10 +211,16 @@ function createLeftLeg(x, y, z) {
 	var thigh, leg, topWheel, botWheel;
 
 	// thigh
-	thigh = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 8), materials.get("red"));
+	geometry = new THREE.BoxGeometry(10, 8, 8);
+	thigh = new THREE.Mesh(geometry, materials.get("red"));
+	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	thigh.add(line);
 
 	// leg
-	leg = new THREE.Mesh(new THREE.BoxGeometry(6, 24, 4), materials.get("orange"));
+	geometry = new THREE.BoxGeometry(6, 24, 4);
+	leg = new THREE.Mesh(geometry, materials.get("orange"));
+	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	leg.add(line);
 	leg.position.set(2, -16, 2);
 
 	// wheels
@@ -222,10 +244,16 @@ function createRightLeg(x, y, z) {
 	var thigh, leg, topWheel, botWheel;
 
 	// thigh
-	thigh = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 8), materials.get("red"));
-
+	geometry = new THREE.BoxGeometry(10, 8, 8);
+	thigh = new THREE.Mesh(geometry, materials.get("red"));
+	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	thigh.add(line);
+	
 	// leg
-	leg = new THREE.Mesh(new THREE.BoxGeometry(6, 24, 4), materials.get("orange"));
+	geometry = new THREE.BoxGeometry(6, 24, 4);
+	leg = new THREE.Mesh(geometry, materials.get("orange"));
+	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	leg.add(line);
 	leg.position.set(2, -16, -2);
 
 	// wheels
@@ -247,7 +275,10 @@ function createRightLeg(x, y, z) {
 function createLeftFoot(x, y, z) {
 	"use strict";
 	// foot
-	var lFoot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), materials.get("red"));
+	geometry = new THREE.BoxGeometry(8, 4, 8);
+	var lFoot = new THREE.Mesh(geometry, materials.get("red"));
+	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	lFoot.add(line);
 	lFoot.position.set(x, y, z);
 
 	return lFoot;
@@ -256,7 +287,10 @@ function createLeftFoot(x, y, z) {
 function createRightFoot(x, y, z) {
 	"use strict";
 	// foot
-	var rFoot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), materials.get("red"));
+	geometry = new THREE.BoxGeometry(8, 4, 8);
+	var rFoot = new THREE.Mesh(geometry, materials.get("red"));
+	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	rFoot.add(line);
 	rFoot.position.set(x, y, z);
 
 	return rFoot;
@@ -294,19 +328,67 @@ function createTransformer(x, y, z) {
 	scene.add(transformer);
 }
 
+function createTrailer(x, y, z) {
+	"use strict";
+	var container, axle1, axle2, wheel1, wheel2, wheel3, wheel4, link;
+
+	// container
+	geometry = new THREE.BoxGeometry(60, 24, 24);
+	container = new THREE.Mesh(geometry, materials.get("red"));
+	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	container.add(line);
+
+	// axles
+	geometry = new THREE.BoxGeometry(20, 6, 4);
+	axle1 = new THREE.Mesh(geometry, materials.get("gray"));
+	axle2 = new THREE.Mesh(geometry, materials.get("gray"));
+	axle1.position.set(-15, -15, -6);
+	axle2.position.set(-15, -15, 6);
+
+	// wheels
+	geometry = new THREE.CylinderGeometry(4, 4, 4, 32);
+	wheel1 = new THREE.Mesh(geometry, materials.get("darkGray"));
+	wheel2 = new THREE.Mesh(geometry, materials.get("darkGray"));
+	wheel3 = new THREE.Mesh(geometry, materials.get("darkGray"));
+	wheel4 = new THREE.Mesh(geometry, materials.get("darkGray"));
+	wheel1.rotation.x = Math.PI / 2;
+	wheel2.rotation.x = Math.PI / 2;
+	wheel3.rotation.x = Math.PI / 2;
+	wheel4.rotation.x = Math.PI / 2;
+	wheel1.position.set(-20, -16, -10);
+	wheel2.position.set(-10, -16, -10);
+	wheel3.position.set(-20, -16, 10);
+	wheel4.position.set(-10, -16, 10);
+
+	// link
+	geometry = new THREE.BoxGeometry(4, 4, 8);
+	link = new THREE.Mesh(geometry, materials.get("gray"));
+	link.position.set(32, -6, 0);
+	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	link.add(line);
+
+	// full trailer
+	trailer = new THREE.Object3D();
+	trailer.add(container, axle1, axle2, wheel1, wheel2, wheel3, wheel4, link);
+	trailer.position.set(x, y, z);
+
+	scene.add(trailer);
+}
+
 function createScene() {
 	"use strict";
 
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color("rgb(230, 230, 230)");
 
-	createTransformer(0, 8, 0);
+	createTransformer(0, 2, 0);
+	createTrailer(-45, 12, 0);
 }
 
 function createOrthographicCamera(x, y, z) {
 	"use strict";
 	var ratio = window.innerWidth / window.innerHeight;
-	var newCamera = new THREE.OrthographicCamera(-50 * ratio, 50 * ratio, 50, -50, 1, 1000);
+	var newCamera = new THREE.OrthographicCamera(-80 * ratio, 80 * ratio, 80, -80, 1, 1000);
 	newCamera.position.set(x, y, z);
 	newCamera.lookAt(scene.position);
 	return newCamera;
@@ -314,7 +396,7 @@ function createOrthographicCamera(x, y, z) {
 
 function createPerspectiveCamera(x, y, z) {
 	"use strict";
-	var newCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+	var newCamera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1000);
 	newCamera.position.set(x, y, z);
 	newCamera.lookAt(scene.position);
 	return newCamera;
@@ -463,6 +545,26 @@ function rotateWaist(up) {
 	}
 }
 
+function moveTrailerZ(left) {
+	var velocity = new THREE.Vector3(0, 0, 35).multiplyScalar(delta);
+
+	if (left) {
+		trailer.position.add(velocity);
+	} else {
+		trailer.position.sub(velocity);
+	}
+}
+
+function moveTrailerX(left) {
+	var velocity = new THREE.Vector3(35, 0, 0).multiplyScalar(delta);
+
+	if (left) {
+		trailer.position.add(velocity);
+	} else {
+		trailer.position.sub(velocity);
+	}
+}
+
 function update() {
 	"use strict";
 
@@ -497,6 +599,22 @@ function update() {
 	if (keys[70] == 1) {
 		console.log("F");
 		rotateHead(false);
+	}
+	if (keys[37] == 1) {
+		console.log("L-Arrow");
+		moveTrailerZ(true);
+	}
+	if (keys[39] == 1) {
+		console.log("R-Arrow");
+		moveTrailerZ(false);
+	}
+	if (keys[38] == 1) {
+		console.log("U-Arrow");
+		moveTrailerX(false);
+	}
+	if (keys[40] == 1) {
+		console.log("D-Arrow");
+		moveTrailerX(true);
 	}
 }
 
