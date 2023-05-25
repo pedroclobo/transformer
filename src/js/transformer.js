@@ -437,15 +437,23 @@ function init() {
 }
 
 function rotateHead(up, delta) {
-	var pivot = new THREE.Vector3(-2, 17.5, 0);
+	var pivot = new THREE.Vector3(-2, 17.4, 0);
 	var axis = new THREE.Vector3(0, 0, 1);
 	var velocity = delta * Math.PI;
 
 	if (up && headObject.rotation.z < Math.PI) {
-		headObject.rotateOnWorldAxis(axis, velocity);
+		headObject.rotation.z = THREE.MathUtils.clamp(
+			headObject.rotation.z + velocity,
+			0,
+			Math.PI
+		);
 		headObject.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
 	} else if (!up && headObject.rotation.z > 0) {
-		headObject.rotateOnWorldAxis(axis, -velocity);
+		headObject.rotation.z = THREE.MathUtils.clamp(
+			headObject.rotation.z - velocity,
+			0,
+			Math.PI
+		);
 		headObject.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
 	}
 }
@@ -455,20 +463,35 @@ function rotateFeet(up, delta) {
 	var axis = new THREE.Vector3(0, 0, 1);
 	var velocity = delta * Math.PI;
 
-	if (up && lFoot.rotation.z < 0 && rFoot.rotation.z < 0) {
-		lFoot.rotateOnWorldAxis(axis, velocity);
+	if (up && (lFoot.rotation.z < 0 || rFoot.rotation.z < 0)) {
+		lFoot.rotation.z = THREE.MathUtils.clamp(
+			lFoot.rotation.z + velocity,
+			-Math.PI / 2,
+			0
+		);
 		lFoot.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
-		rFoot.rotateOnWorldAxis(axis, velocity);
+		rFoot.rotation.z = THREE.MathUtils.clamp(
+			rFoot.rotation.z + velocity,
+			-Math.PI / 2,
+			0
+		);
 		rFoot.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
 	} else if (
 		!up &&
-		lFoot.rotation.z > -Math.PI / 2 &&
-		rFoot.rotation.z > -Math.PI / 2
+		(lFoot.rotation.z > -Math.PI / 2 || rFoot.rotation.z > -Math.PI / 2)
 	) {
-		lFoot.rotateOnWorldAxis(axis, -velocity);
-		rFoot.rotateOnWorldAxis(axis, -velocity);
-		rFoot.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
+		lFoot.rotation.z = THREE.MathUtils.clamp(
+			lFoot.rotation.z - velocity,
+			-Math.PI / 2,
+			0
+		);
 		lFoot.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
+		rFoot.rotation.z = THREE.MathUtils.clamp(
+			rFoot.rotation.z - velocity,
+			-Math.PI / 2,
+			0
+		);
+		rFoot.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
 	}
 }
 
@@ -490,10 +513,18 @@ function rotateWaist(up, delta) {
 	var velocity = delta * Math.PI;
 
 	if (up && lowerBody.rotation.z < 0) {
-		lowerBody.rotateOnWorldAxis(axis, velocity);
+		lowerBody.rotation.z = THREE.MathUtils.clamp(
+			lowerBody.rotation.z + velocity,
+			-Math.PI / 2,
+			0
+		);
 		lowerBody.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
-	} else if (!up && lowerBody.rotation.z > -Math.PI) {
-		lowerBody.rotateOnWorldAxis(axis, -velocity);
+	} else if (!up && lowerBody.rotation.z > -Math.PI / 2) {
+		lowerBody.rotation.z = THREE.MathUtils.clamp(
+			lowerBody.rotation.z - velocity,
+			-Math.PI / 2,
+			0
+		);
 		lowerBody.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
 	}
 }
@@ -539,7 +570,6 @@ function animate() {
 	"use strict";
 
 	var delta = clock.getDelta();
-	console.log(delta);
 
 	update(delta);
 	render();
