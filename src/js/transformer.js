@@ -320,11 +320,9 @@ function createScene() {
 	"use strict";
 
 	scene = new THREE.Scene();
-	scene.background = new THREE.Color("rgb(0, 170, 255)");
+	scene.background = new THREE.Color("rgb(230, 230, 230)");
 
-	scene.add(new THREE.GridHelper(100, 10));
-
-	createTransformer(0, 0, 0);
+	createTransformer(0, 8, 0);
 }
 
 function createOrthographicCamera(x, y, z) {
