@@ -5,11 +5,21 @@ var currentCameraIndex = 0;
 var cameras = [],
 	scene,
 	renderer;
+
 var clock;
 
 var keys = {};
+let materials = new Map([
+	['yellow', new THREE.MeshBasicMaterial({ color: 0xffd91c, wireframe: true })],
+	['orange', new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true })],
+	['darkOrange', new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true })],
+	['red', new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true })],
+	['lightBlue', new THREE.MeshBasicMaterial({ color: 0xa8eeff, wireframe: true })],
+	['gray', new THREE.MeshBasicMaterial({ color: 0x7a7a7a, wireframe: true })],
+	['lightGray', new THREE.MeshBasicMaterial({ color: 0x9c9c9c, wireframe: true })],
+	['darkGray', new THREE.MeshBasicMaterial({ color: 0x242424, wireframe: true })]
+  ]);
 
-var geometry, material, mesh;
 var head, neck, lEye, rEye, lAntenna, rAntenna, headObject;
 var chest, lPectoralis, rPectoralis, chestObject;
 var abdomen;
@@ -31,25 +41,21 @@ function addHead(x, y, z) {
 	"use strict";
 
 	// head
-	material = new THREE.MeshBasicMaterial({ color: 0xffd91c, wireframe: true });
-	head = new THREE.Mesh(new THREE.SphereGeometry(4, 32, 16), material);
+	head = new THREE.Mesh(new THREE.SphereGeometry(4, 32, 16), materials.get("yellow"));
 
 	// neck
-	material = new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true });
-	neck = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 3, 32), material);
+	neck = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 3, 32), materials.get("orange"));
 	neck.position.y = -1.5;
 
 	// eyes
-	material = new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true });
-	lEye = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2, 2), material);
-	material = new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true }); // FIX: if i remove this line, 'a' doesnt work for the eyes and antennas!
-	rEye = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2, 2), material);
+	lEye = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2, 2), materials.get("darkOrange"));
+	rEye = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2, 2), materials.get("darkOrange"));
 	lEye.position.set(3, 0.4, -1.8);
 	rEye.position.set(3, 0.4, 1.8);
 
 	// antennas
-	lAntenna = new THREE.Mesh(new THREE.ConeGeometry(1, 3, 16), material);
-	rAntenna = new THREE.Mesh(new THREE.ConeGeometry(1, 3, 16), material);
+	lAntenna = new THREE.Mesh(new THREE.ConeGeometry(1, 3, 16), materials.get("darkOrange"));
+	rAntenna = new THREE.Mesh(new THREE.ConeGeometry(1, 3, 16), materials.get("darkOrange"));
 	lAntenna.rotation.x = THREE.MathUtils.degToRad(-20);
 	rAntenna.rotation.x = THREE.MathUtils.degToRad(20);
 	lAntenna.position.set(1, 3.8, -2.5);
@@ -66,14 +72,11 @@ function addHead(x, y, z) {
 function addChest(x, y, z) {
 	"use strict";
 	// chest
-	material = new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true });
-	chest = new THREE.Mesh(new THREE.BoxGeometry(18, 16, 24), material);
+	chest = new THREE.Mesh(new THREE.BoxGeometry(18, 16, 24), materials.get("red"));
 
 	// pectoralis
-	material = new THREE.MeshBasicMaterial({ color: 0xa8eeff, wireframe: true });
-	lPectoralis = new THREE.Mesh(new THREE.BoxGeometry(0.5, 7, 9), material);
-	material = new THREE.MeshBasicMaterial({ color: 0xa8eeff, wireframe: true });
-	rPectoralis = new THREE.Mesh(new THREE.BoxGeometry(0.5, 7, 9), material);
+	lPectoralis = new THREE.Mesh(new THREE.BoxGeometry(0.5, 7, 9), materials.get("lightBlue"));
+	rPectoralis = new THREE.Mesh(new THREE.BoxGeometry(0.5, 7, 9), materials.get("lightBlue"));
 	lPectoralis.position.set(9, 1, -5.5);
 	rPectoralis.position.set(9, 1, 5.5);
 
@@ -88,9 +91,7 @@ function addChest(x, y, z) {
 function addAbdomen(x, y, z) {
 	"use strict";
 	// abdomen
-	material = new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true });
-	abdomen = new THREE.Mesh(new THREE.BoxGeometry(15.5, 8, 12), material);
-
+	abdomen = new THREE.Mesh(new THREE.BoxGeometry(15.5, 8, 12), materials.get("darkOrange"));
 	abdomen.position.set(x, y, z);
 
 	return abdomen;
@@ -99,38 +100,26 @@ function addAbdomen(x, y, z) {
 function addLeftArm(x, y, z) {
 	"use strict";
 	// shoulder
-	material = new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true });
-	shoulder = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 4), material);
+	shoulder = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 4), materials.get("darkOrange"));
 
 	// forearm
-	material = new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true });
-	forearm = new THREE.Mesh(new THREE.BoxGeometry(5, 14, 4), material);
+	forearm = new THREE.Mesh(new THREE.BoxGeometry(5, 14, 4), materials.get("orange"));
 	forearm.position.set(0, -3.5, -4);
 
 	// arm
-	material = new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true });
-	arm = new THREE.Mesh(new THREE.BoxGeometry(12, 4, 4), material);
+	arm = new THREE.Mesh(new THREE.BoxGeometry(12, 4, 4), materials.get("orange"));
 	arm.position.set(3.5, -12.5, -4);
 
 	// hand
-	material = new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true });
-	hand = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 4), material);
+	hand = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 4), materials.get("red"));
 	hand.position.set(12.5, -12.5, -4);
 
 	// bot exhaust
-	material = new THREE.MeshBasicMaterial({ color: 0x7a7a7a, wireframe: true });
-	botExhaust = new THREE.Mesh(
-		new THREE.CylinderGeometry(1.5, 1.5, 12, 16),
-		material
-	);
+	botExhaust = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 12, 16), materials.get("gray"));
 	botExhaust.position.set(-3.5, 3.5, -3.5);
 
 	// top exhaust
-	material = new THREE.MeshBasicMaterial({ color: 0x9c9c9c, wireframe: true });
-	topExhaust = new THREE.Mesh(
-		new THREE.CylinderGeometry(1, 1, 8, 16),
-		material
-	);
+	topExhaust = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 8, 16), materials.get("lightGray"));
 	topExhaust.position.set(-3.5, 13.5, -3.5);
 
 	// full arm
@@ -144,38 +133,26 @@ function addLeftArm(x, y, z) {
 function addRightArm(x, y, z) {
 	"use strict";
 	// shoulder
-	material = new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true });
-	shoulder = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 4), material);
+	shoulder = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 4), materials.get("darkOrange"));
 
 	// forearm
-	material = new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true });
-	forearm = new THREE.Mesh(new THREE.BoxGeometry(5, 14, 4), material);
+	forearm = new THREE.Mesh(new THREE.BoxGeometry(5, 14, 4), materials.get("orange"));
 	forearm.position.set(0, -3.5, 4);
 
 	// arm
-	material = new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true });
-	arm = new THREE.Mesh(new THREE.BoxGeometry(12, 4, 4), material);
+	arm = new THREE.Mesh(new THREE.BoxGeometry(12, 4, 4), materials.get("orange"));
 	arm.position.set(3.5, -12.5, 4);
 
 	// hand
-	material = new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true });
-	hand = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 4), material);
+	hand = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 4), materials.get("red"));
 	hand.position.set(12.5, -12.5, 4);
 
 	// bot exhaust
-	material = new THREE.MeshBasicMaterial({ color: 0x7a7a7a, wireframe: true });
-	botExhaust = new THREE.Mesh(
-		new THREE.CylinderGeometry(1.5, 1.5, 12, 16),
-		material
-	);
+	botExhaust = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 12, 16), materials.get("gray"));
 	botExhaust.position.set(-3.5, 3.5, 3.5);
 
 	// top exhaust
-	material = new THREE.MeshBasicMaterial({ color: 0x9c9c9c, wireframe: true });
-	topExhaust = new THREE.Mesh(
-		new THREE.CylinderGeometry(1, 1, 8, 16),
-		material
-	);
+	topExhaust = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 8, 16), materials.get("lightGray"));
 	topExhaust.position.set(-3.5, 13.5, 3.5);
 
 	// full arm
@@ -189,14 +166,11 @@ function addRightArm(x, y, z) {
 function addWaist(x, y, z) {
 	"use strict";
 	// waist
-	material = new THREE.MeshBasicMaterial({ color: 0xffd91c, wireframe: true });
-	waist = new THREE.Mesh(new THREE.BoxGeometry(12, 8, 24), material);
+	waist = new THREE.Mesh(new THREE.BoxGeometry(12, 8, 24), materials.get("yellow"));
 
 	// wheels
-	material = new THREE.MeshBasicMaterial({ color: 0x242424, wireframe: true });
-	lwheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), material);
-	material = new THREE.MeshBasicMaterial({ color: 0x242424, wireframe: true });
-	rwheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), material);
+	lwheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
+	rwheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
 	lwheel.rotation.x = Math.PI / 2;
 	rwheel.rotation.x = Math.PI / 2;
 	lwheel.position.set(4, 0, -14);
@@ -215,19 +189,15 @@ function addLeftLeg(x, y, z) {
 	var thigh, leg, topWheel, botWheel, legObject;
 
 	// thigh
-	material = new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true });
-	thigh = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 8), material);
+	thigh = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 8), materials.get("red"));
 
 	// leg
-	material = new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true });
-	leg = new THREE.Mesh(new THREE.BoxGeometry(6, 24, 4), material);
+	leg = new THREE.Mesh(new THREE.BoxGeometry(6, 24, 4), materials.get("orange"));
 	leg.position.set(2, -16, 2);
 
 	// wheels
-	material = new THREE.MeshBasicMaterial({ color: 0x242424, wireframe: true });
-	topWheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), material);
-	material = new THREE.MeshBasicMaterial({ color: 0x242424, wireframe: true });
-	botWheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), material);
+	topWheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
+	botWheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
 	topWheel.rotation.x = Math.PI / 2;
 	botWheel.rotation.x = Math.PI / 2;
 	topWheel.position.set(3, -10, -2);
@@ -246,19 +216,15 @@ function addRightLeg(x, y, z) {
 	var thigh, leg, topWheel, botWheel, legObject;
 
 	// thigh
-	material = new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true });
-	thigh = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 8), material);
+	thigh = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 8), materials.get("red"));
 
 	// leg
-	material = new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true });
-	leg = new THREE.Mesh(new THREE.BoxGeometry(6, 24, 4), material);
+	leg = new THREE.Mesh(new THREE.BoxGeometry(6, 24, 4), materials.get("orange"));
 	leg.position.set(2, -16, -2);
 
 	// wheels
-	material = new THREE.MeshBasicMaterial({ color: 0x242424, wireframe: true });
-	topWheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), material);
-	material = new THREE.MeshBasicMaterial({ color: 0x242424, wireframe: true });
-	botWheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), material);
+	topWheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
+	botWheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
 	topWheel.rotation.x = Math.PI / 2;
 	botWheel.rotation.x = Math.PI / 2;
 	topWheel.position.set(3, -10, 2);
@@ -275,8 +241,7 @@ function addRightLeg(x, y, z) {
 function addLeftFoot(x, y, z) {
 	"use strict";
 	// foot
-	material = new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true });
-	lFoot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), material);
+	lFoot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), materials.get("red"));
 
 	lFoot.position.set(x, y, z);
 
@@ -286,8 +251,7 @@ function addLeftFoot(x, y, z) {
 function addRightFoot(x, y, z) {
 	"use strict";
 	// foot
-	material = new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true });
-	rFoot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), material);
+	rFoot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 8), materials.get("red"));
 	rFoot.position.set(x, y, z);
 
 	return rFoot;
@@ -391,13 +355,11 @@ function onKeyDown(e) {
 	}
 
 	switch (e.keyCode) {
-		// control wireframe
+		// toggle wireframe
 		case 90: //Z
-			scene.traverse(function (node) {
-				if (node instanceof THREE.Mesh) {
-					node.material.wireframe = !node.material.wireframe;
-				}
-			});
+			for (let material of materials.values()) {
+				material.wireframe = !material.wireframe;
+			}
 			break;
 		default:
 			keys[e.keyCode] = 1;
