@@ -13,8 +13,14 @@ var robot_arms = true;
 var robot_head = true;
 var robot_feet = true;
 
-var transformerAABB;
-var trailerAABB;
+var transformerAABB = {
+	min: new THREE.Vector3(),
+	max: new THREE.Vector3(),
+};
+var trailerAABB = {
+	min: new THREE.Vector3(),
+	max: new THREE.Vector3(),
+};
 
 var animating = false;
 var coupled = false;
@@ -25,19 +31,17 @@ function is_truck() {
 }
 
 function updateTransformerAABB() {
+	"use strict";
 	var transformerBox = new THREE.Box3().setFromObject(transformer);
-	var transformerMin = transformerBox.min;
-	var transformerMax = transformerBox.max;
-
-	transformerAABB = new THREE.Box3(transformerMin, transformerMax);
+	transformerAABB.min = transformerBox.min;
+	transformerAABB.max = transformerBox.max;
 }
 
 function updateTrailerAABB() {
+	"use strict";
 	var trailerBox = new THREE.Box3().setFromObject(trailer);
-	var trailerMin = trailerBox.min;
-	var trailerMax = trailerBox.max;
-
-	trailerAABB = new THREE.Box3(trailerMin, trailerMax);
+	trailerAABB.min = trailerBox.min;
+	trailerAABB.max = trailerBox.max;
 }
 
 var materials = new Map([
@@ -822,8 +826,19 @@ function moveTrailerX(left) {
 	updateTrailerAABB();
 }
 
+function intersects() {
+	return (
+		transformerAABB.max.x > trailerAABB.min.x &&
+		transformerAABB.min.x < trailerAABB.max.x &&
+		transformerAABB.max.y > trailerAABB.min.y &&
+		transformerAABB.min.y < trailerAABB.max.y &&
+		transformerAABB.max.z > trailerAABB.min.z &&
+		transformerAABB.min.z < trailerAABB.max.z
+	);
+}
+
 function isCollision() {
-	return is_truck() && transformerAABB.intersectsBox(trailerAABB);
+	return is_truck() && intersects();
 }
 
 function handleCollision() {
