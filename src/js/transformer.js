@@ -11,22 +11,31 @@ var currentCameraIndex = 0,
 var keys = {};
 
 var materials = new Map([
-	['yellow', new THREE.MeshBasicMaterial({ color: 0xffd91c, wireframe: true })],
-	['orange', new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true })],
-	['darkOrange', new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true })],
-	['red', new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true })],
-	['lightBlue', new THREE.MeshBasicMaterial({ color: 0xa8eeff, wireframe: true })],
-	['gray', new THREE.MeshBasicMaterial({ color: 0x7a7a7a, wireframe: true })],
-	['lightGray', new THREE.MeshBasicMaterial({ color: 0xacacac, wireframe: true })],
-	['darkGray', new THREE.MeshBasicMaterial({ color: 0x242424, wireframe: true })]
-  ]);
+	["yellow", new THREE.MeshBasicMaterial({ color: 0xffd91c, wireframe: true })],
+	["orange", new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true })],
+	[
+		"darkOrange",
+		new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true }),
+	],
+	["red", new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true })],
+	[
+		"lightBlue",
+		new THREE.MeshBasicMaterial({ color: 0xa8eeff, wireframe: true }),
+	],
+	["gray", new THREE.MeshBasicMaterial({ color: 0x7a7a7a, wireframe: true })],
+	[
+		"lightGray",
+		new THREE.MeshBasicMaterial({ color: 0xacacac, wireframe: true }),
+	],
+	[
+		"darkGray",
+		new THREE.MeshBasicMaterial({ color: 0x242424, wireframe: true }),
+	],
+]);
 
-var geometry,
-  	line;
+var geometry, line;
 
-var transformer,
-  	lowerBody,
-	feet;
+var transformer, lowerBody, feet;
 
 var headObject,
 	chestObject,
@@ -45,21 +54,39 @@ function createHead(x, y, z) {
 	var head, neck, lEye, rEye, lAntenna, rAntenna;
 
 	// head
-	head = new THREE.Mesh(new THREE.SphereGeometry(4, 32, 16), materials.get("yellow"));
+	head = new THREE.Mesh(
+		new THREE.SphereGeometry(4, 32, 16),
+		materials.get("yellow")
+	);
 
 	// neck
-	neck = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 3, 32), materials.get("orange"));
+	neck = new THREE.Mesh(
+		new THREE.CylinderGeometry(4, 4, 3, 32),
+		materials.get("orange")
+	);
 	neck.position.y = -1.5;
 
 	// eyes
-	lEye = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2, 2), materials.get("darkOrange"));
-	rEye = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2, 2), materials.get("darkOrange"));
+	lEye = new THREE.Mesh(
+		new THREE.BoxGeometry(2.2, 2, 2),
+		materials.get("darkOrange")
+	);
+	rEye = new THREE.Mesh(
+		new THREE.BoxGeometry(2.2, 2, 2),
+		materials.get("darkOrange")
+	);
 	lEye.position.set(3, 0.4, -1.8);
 	rEye.position.set(3, 0.4, 1.8);
 
 	// antennas
-	lAntenna = new THREE.Mesh(new THREE.ConeGeometry(1, 3, 16), materials.get("darkOrange"));
-	rAntenna = new THREE.Mesh(new THREE.ConeGeometry(1, 3, 16), materials.get("darkOrange"));
+	lAntenna = new THREE.Mesh(
+		new THREE.ConeGeometry(1, 3, 16),
+		materials.get("darkOrange")
+	);
+	rAntenna = new THREE.Mesh(
+		new THREE.ConeGeometry(1, 3, 16),
+		materials.get("darkOrange")
+	);
 	lAntenna.rotation.x = THREE.MathUtils.degToRad(-20);
 	rAntenna.rotation.x = THREE.MathUtils.degToRad(20);
 	lAntenna.position.set(1, 3.8, -2.5);
@@ -80,12 +107,21 @@ function createChest(x, y, z) {
 	// chest
 	geometry = new THREE.BoxGeometry(18, 16, 24);
 	chest = new THREE.Mesh(geometry, materials.get("red"));
-	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	line = new THREE.LineSegments(
+		new THREE.EdgesGeometry(geometry),
+		new THREE.LineBasicMaterial({ color: 0x0 })
+	);
 	chest.add(line);
 
 	// pectoralis
-	lPectoralis = new THREE.Mesh(new THREE.BoxGeometry(0.5, 7, 9), materials.get("lightBlue"));
-	rPectoralis = new THREE.Mesh(new THREE.BoxGeometry(0.5, 7, 9), materials.get("lightBlue"));
+	lPectoralis = new THREE.Mesh(
+		new THREE.BoxGeometry(0.5, 7, 9),
+		materials.get("lightBlue")
+	);
+	rPectoralis = new THREE.Mesh(
+		new THREE.BoxGeometry(0.5, 7, 9),
+		materials.get("lightBlue")
+	);
 	lPectoralis.position.set(9, 1, -5.5);
 	rPectoralis.position.set(9, 1, 5.5);
 
@@ -103,7 +139,10 @@ function createAbdomen(x, y, z) {
 
 	geometry = new THREE.BoxGeometry(15.5, 8, 12);
 	abdomen = new THREE.Mesh(geometry, materials.get("lightGray"));
-	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	line = new THREE.LineSegments(
+		new THREE.EdgesGeometry(geometry),
+		new THREE.LineBasicMaterial({ color: 0x0 })
+	);
 	abdomen.add(line);
 	abdomen.position.set(x, y, z);
 
@@ -115,14 +154,23 @@ function createLeftArm(x, y, z) {
 	var shoulder, forearm, arm, hand, botExhaust, topExhaust;
 
 	// shoulder
-	shoulder = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 4), materials.get("darkOrange"));
+	shoulder = new THREE.Mesh(
+		new THREE.BoxGeometry(5, 5, 4),
+		materials.get("darkOrange")
+	);
 
 	// forearm
-	forearm = new THREE.Mesh(new THREE.BoxGeometry(5, 14, 4), materials.get("orange"));
+	forearm = new THREE.Mesh(
+		new THREE.BoxGeometry(5, 14, 4),
+		materials.get("orange")
+	);
 	forearm.position.set(0, -3.5, -4);
 
 	// arm
-	arm = new THREE.Mesh(new THREE.BoxGeometry(12, 4, 4), materials.get("orange"));
+	arm = new THREE.Mesh(
+		new THREE.BoxGeometry(12, 4, 4),
+		materials.get("orange")
+	);
 	arm.position.set(3.5, -12.5, -4);
 
 	// hand
@@ -130,11 +178,17 @@ function createLeftArm(x, y, z) {
 	hand.position.set(12.5, -12.5, -4);
 
 	// bot exhaust
-	botExhaust = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 12, 16), materials.get("gray"));
+	botExhaust = new THREE.Mesh(
+		new THREE.CylinderGeometry(1.5, 1.5, 12, 16),
+		materials.get("gray")
+	);
 	botExhaust.position.set(-3.5, 3.5, -3.5);
 
 	// top exhaust
-	topExhaust = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 8, 16), materials.get("lightGray"));
+	topExhaust = new THREE.Mesh(
+		new THREE.CylinderGeometry(1, 1, 8, 16),
+		materials.get("lightGray")
+	);
 	topExhaust.position.set(-3.5, 13.5, -3.5);
 
 	// full arm
@@ -150,14 +204,23 @@ function createRightArm(x, y, z) {
 	var shoulder, forearm, arm, hand, botExhaust, topExhaust;
 
 	// shoulder
-	shoulder = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 4), materials.get("darkOrange"));
+	shoulder = new THREE.Mesh(
+		new THREE.BoxGeometry(5, 5, 4),
+		materials.get("darkOrange")
+	);
 
 	// forearm
-	forearm = new THREE.Mesh(new THREE.BoxGeometry(5, 14, 4), materials.get("orange"));
+	forearm = new THREE.Mesh(
+		new THREE.BoxGeometry(5, 14, 4),
+		materials.get("orange")
+	);
 	forearm.position.set(0, -3.5, 4);
 
 	// arm
-	arm = new THREE.Mesh(new THREE.BoxGeometry(12, 4, 4), materials.get("orange"));
+	arm = new THREE.Mesh(
+		new THREE.BoxGeometry(12, 4, 4),
+		materials.get("orange")
+	);
 	arm.position.set(3.5, -12.5, 4);
 
 	// hand
@@ -165,11 +228,17 @@ function createRightArm(x, y, z) {
 	hand.position.set(12.5, -12.5, 4);
 
 	// bot exhaust
-	botExhaust = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 12, 16), materials.get("gray"));
+	botExhaust = new THREE.Mesh(
+		new THREE.CylinderGeometry(1.5, 1.5, 12, 16),
+		materials.get("gray")
+	);
 	botExhaust.position.set(-3.5, 3.5, 3.5);
 
 	// top exhaust
-	topExhaust = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 8, 16), materials.get("lightGray"));
+	topExhaust = new THREE.Mesh(
+		new THREE.CylinderGeometry(1, 1, 8, 16),
+		materials.get("lightGray")
+	);
 	topExhaust.position.set(-3.5, 13.5, 3.5);
 
 	// full arm
@@ -187,12 +256,21 @@ function createWaist(x, y, z) {
 
 	geometry = new THREE.BoxGeometry(12, 8, 23.75);
 	waist = new THREE.Mesh(geometry, materials.get("gray"));
-	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	line = new THREE.LineSegments(
+		new THREE.EdgesGeometry(geometry),
+		new THREE.LineBasicMaterial({ color: 0x0 })
+	);
 	waist.add(line);
-	
+
 	// wheels
-	lwheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
-	rwheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
+	lwheel = new THREE.Mesh(
+		new THREE.CylinderGeometry(4, 4, 4, 32),
+		materials.get("darkGray")
+	);
+	rwheel = new THREE.Mesh(
+		new THREE.CylinderGeometry(4, 4, 4, 32),
+		materials.get("darkGray")
+	);
 	lwheel.rotation.x = Math.PI / 2;
 	rwheel.rotation.x = Math.PI / 2;
 	lwheel.position.set(4, 0, -14);
@@ -213,19 +291,31 @@ function createLeftLeg(x, y, z) {
 	// thigh
 	geometry = new THREE.BoxGeometry(10, 8, 8);
 	thigh = new THREE.Mesh(geometry, materials.get("red"));
-	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	line = new THREE.LineSegments(
+		new THREE.EdgesGeometry(geometry),
+		new THREE.LineBasicMaterial({ color: 0x0 })
+	);
 	thigh.add(line);
 
 	// leg
 	geometry = new THREE.BoxGeometry(6, 24, 4);
 	leg = new THREE.Mesh(geometry, materials.get("orange"));
-	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	line = new THREE.LineSegments(
+		new THREE.EdgesGeometry(geometry),
+		new THREE.LineBasicMaterial({ color: 0x0 })
+	);
 	leg.add(line);
 	leg.position.set(2, -16, 2);
 
 	// wheels
-	topWheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
-	botWheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
+	topWheel = new THREE.Mesh(
+		new THREE.CylinderGeometry(4, 4, 4, 32),
+		materials.get("darkGray")
+	);
+	botWheel = new THREE.Mesh(
+		new THREE.CylinderGeometry(4, 4, 4, 32),
+		materials.get("darkGray")
+	);
 	topWheel.rotation.x = Math.PI / 2;
 	botWheel.rotation.x = Math.PI / 2;
 	topWheel.position.set(3, -10, -2);
@@ -246,19 +336,31 @@ function createRightLeg(x, y, z) {
 	// thigh
 	geometry = new THREE.BoxGeometry(10, 8, 8);
 	thigh = new THREE.Mesh(geometry, materials.get("red"));
-	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	line = new THREE.LineSegments(
+		new THREE.EdgesGeometry(geometry),
+		new THREE.LineBasicMaterial({ color: 0x0 })
+	);
 	thigh.add(line);
-	
+
 	// leg
 	geometry = new THREE.BoxGeometry(6, 24, 4);
 	leg = new THREE.Mesh(geometry, materials.get("orange"));
-	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	line = new THREE.LineSegments(
+		new THREE.EdgesGeometry(geometry),
+		new THREE.LineBasicMaterial({ color: 0x0 })
+	);
 	leg.add(line);
 	leg.position.set(2, -16, -2);
 
 	// wheels
-	topWheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
-	botWheel = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 4, 32), materials.get("darkGray"));
+	topWheel = new THREE.Mesh(
+		new THREE.CylinderGeometry(4, 4, 4, 32),
+		materials.get("darkGray")
+	);
+	botWheel = new THREE.Mesh(
+		new THREE.CylinderGeometry(4, 4, 4, 32),
+		materials.get("darkGray")
+	);
 	topWheel.rotation.x = Math.PI / 2;
 	botWheel.rotation.x = Math.PI / 2;
 	topWheel.position.set(3, -10, 2);
@@ -277,7 +379,10 @@ function createLeftFoot(x, y, z) {
 	// foot
 	geometry = new THREE.BoxGeometry(8, 4, 8);
 	var lFoot = new THREE.Mesh(geometry, materials.get("red"));
-	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	line = new THREE.LineSegments(
+		new THREE.EdgesGeometry(geometry),
+		new THREE.LineBasicMaterial({ color: 0x0 })
+	);
 	lFoot.add(line);
 	lFoot.position.set(x, y, z);
 
@@ -289,7 +394,10 @@ function createRightFoot(x, y, z) {
 	// foot
 	geometry = new THREE.BoxGeometry(8, 4, 8);
 	var rFoot = new THREE.Mesh(geometry, materials.get("red"));
-	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	line = new THREE.LineSegments(
+		new THREE.EdgesGeometry(geometry),
+		new THREE.LineBasicMaterial({ color: 0x0 })
+	);
 	rFoot.add(line);
 	rFoot.position.set(x, y, z);
 
@@ -303,24 +411,21 @@ function createTransformer(x, y, z) {
 	lowerBody = new THREE.Object3D();
 	feet = new THREE.Object3D();
 
-	feet.add(
-		createLeftFoot(-1, -44, -8), 
-		createRightFoot(-1, -44, 8)
-	);
+	feet.add(createLeftFoot(-1, -44, -8), createRightFoot(-1, -44, 8));
 
 	lowerBody.add(
-		createWaist(-5, -6, 0), 
-		createLeftLeg(-4, -14, -8), 
-		createRightLeg(-4, -14, 8), 
+		createWaist(-5, -6, 0),
+		createLeftLeg(-4, -14, -8),
+		createRightLeg(-4, -14, 8),
 		feet
 	);
-	
+
 	transformer.add(
-		createHead(-2, 21, 0), 
-		createChest(-2, 10, 0), 
-		createAbdomen(0, 0, 0), 
-		createLeftArm(-6.5, 12.5, -14), 
-		createRightArm(-6.5, 12.5, 14), 
+		createHead(-2, 21, 0),
+		createChest(-2, 10, 0),
+		createAbdomen(0, 0, 0),
+		createLeftArm(-6.5, 12.5, -14),
+		createRightArm(-6.5, 12.5, 14),
 		lowerBody
 	);
 
@@ -335,7 +440,10 @@ function createTrailer(x, y, z) {
 	// container
 	geometry = new THREE.BoxGeometry(60, 24, 24);
 	container = new THREE.Mesh(geometry, materials.get("red"));
-	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	line = new THREE.LineSegments(
+		new THREE.EdgesGeometry(geometry),
+		new THREE.LineBasicMaterial({ color: 0x0 })
+	);
 	container.add(line);
 
 	// axles
@@ -364,7 +472,10 @@ function createTrailer(x, y, z) {
 	geometry = new THREE.BoxGeometry(4, 4, 8);
 	link = new THREE.Mesh(geometry, materials.get("gray"));
 	link.position.set(32, -6, 0);
-	line = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({color: 0x0}));
+	line = new THREE.LineSegments(
+		new THREE.EdgesGeometry(geometry),
+		new THREE.LineBasicMaterial({ color: 0x0 })
+	);
 	link.add(line);
 
 	// full trailer
@@ -388,7 +499,14 @@ function createScene() {
 function createOrthographicCamera(x, y, z) {
 	"use strict";
 	var ratio = window.innerWidth / window.innerHeight;
-	var newCamera = new THREE.OrthographicCamera(-80 * ratio, 80 * ratio, 80, -80, 1, 1000);
+	var newCamera = new THREE.OrthographicCamera(
+		-80 * ratio,
+		80 * ratio,
+		80,
+		-80,
+		1,
+		1000
+	);
 	newCamera.position.set(x, y, z);
 	newCamera.lookAt(scene.position);
 	return newCamera;
@@ -396,7 +514,12 @@ function createOrthographicCamera(x, y, z) {
 
 function createPerspectiveCamera(x, y, z) {
 	"use strict";
-	var newCamera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1000);
+	var newCamera = new THREE.PerspectiveCamera(
+		80,
+		window.innerWidth / window.innerHeight,
+		1,
+		1000
+	);
 	newCamera.position.set(x, y, z);
 	newCamera.lookAt(scene.position);
 	return newCamera;
@@ -441,8 +564,7 @@ function onKeyDown(e) {
 		for (let material of materials.values()) {
 			material.wireframe = !material.wireframe;
 		}
-	}
-	else keys[e.keyCode] = 1;
+	} else keys[e.keyCode] = 1;
 }
 
 function onKeyUp(e) {
