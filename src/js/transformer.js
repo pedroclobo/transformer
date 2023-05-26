@@ -479,20 +479,37 @@ function rotateHead(up) {
 	var axis = new THREE.Vector3(0, 0, 1);
 	var velocity = delta * Math.PI;
 
-	if (up && headObject.rotation.z < Math.PI) {
-		headObject.rotation.z = THREE.MathUtils.clamp(
+	var lowerLimit = 0 + 0.01; // due to float point imprecision
+	var upperLimit = Math.PI;
+
+	if (up && headObject.rotation.z < upperLimit) {
+		var newRotation = THREE.MathUtils.clamp(
 			headObject.rotation.z + velocity,
-			0,
-			Math.PI
+			lowerLimit,
+			upperLimit
 		);
-		headObject.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
-	} else if (!up && headObject.rotation.z > 0) {
-		headObject.rotation.z = THREE.MathUtils.clamp(
+
+		var rotationDelta = newRotation - headObject.rotation.z;
+
+		headObject.rotateOnWorldAxis(axis, rotationDelta);
+		headObject.position
+			.sub(pivot)
+			.applyAxisAngle(axis, rotationDelta)
+			.add(pivot);
+	} else if (!up && headObject.rotation.z > lowerLimit) {
+		var newRotation = THREE.MathUtils.clamp(
 			headObject.rotation.z - velocity,
-			0,
-			Math.PI
+			lowerLimit,
+			upperLimit
 		);
-		headObject.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
+
+		var rotationDelta = newRotation - headObject.rotation.z;
+
+		headObject.rotateOnWorldAxis(axis, rotationDelta);
+		headObject.position
+			.sub(pivot)
+			.applyAxisAngle(axis, rotationDelta)
+			.add(pivot);
 	}
 }
 
@@ -501,25 +518,58 @@ function rotateFeet(up) {
 	var axis = new THREE.Vector3(0, 0, 1);
 	var velocity = delta * Math.PI;
 
-	if (up && feet.rotation.z < 0) {
-		feet.rotation.z = THREE.MathUtils.clamp(feet.rotation.z + velocity, -Math.PI / 2, 0);
-		feet.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
-	}
-	else if (!up && feet.rotation.z > -Math.PI / 2) {
-		feet.rotation.z = THREE.MathUtils.clamp(feet.rotation.z - velocity, -Math.PI / 2, 0);
-		feet.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
+	var lowerLimit = -Math.PI / 2;
+	var upperLimit = 0;
+
+	if (up && feet.rotation.z < upperLimit) {
+		var newRotation = THREE.MathUtils.clamp(
+			feet.rotation.z + velocity,
+			lowerLimit,
+			upperLimit
+		);
+
+		var rotationDelta = newRotation - feet.rotation.z;
+
+		feet.rotateOnWorldAxis(axis, rotationDelta);
+		feet.position.sub(pivot).applyAxisAngle(axis, rotationDelta).add(pivot);
+	} else if (!up && feet.rotation.z > lowerLimit) {
+		var newRotation = THREE.MathUtils.clamp(
+			feet.rotation.z - velocity,
+			lowerLimit,
+			upperLimit
+		);
+
+		var rotationDelta = newRotation - feet.rotation.z;
+
+		feet.rotateOnWorldAxis(axis, rotationDelta);
+		feet.position.sub(pivot).applyAxisAngle(axis, rotationDelta).add(pivot);
 	}
 }
 
 function moveArms(left) {
 	var velocity = new THREE.Vector3(0, 0, 10).multiplyScalar(delta);
 
+	var leftArmLimit = {
+		min: new THREE.Vector3(-6.5, 12.5, -14),
+		max: new THREE.Vector3(-6.5, 12.5, -10),
+	};
+	var rightArmLimit = {
+		min: new THREE.Vector3(-6.5, 12.5, 10),
+		max: new THREE.Vector3(-6.5, 12.5, 14),
+	};
+
 	if (left) {
 		leftArmObject.position.add(velocity);
+		leftArmObject.position.clamp(leftArmLimit.min, leftArmLimit.max);
+
 		rightArmObject.position.sub(velocity);
-	} else if (!left) {
+		rightArmObject.position.clamp(rightArmLimit.min, rightArmLimit.max);
+	} else {
 		leftArmObject.position.sub(velocity);
+		leftArmObject.position.clamp(leftArmLimit.min, leftArmLimit.max);
+
 		rightArmObject.position.add(velocity);
+		rightArmObject.position.clamp(rightArmLimit.min, rightArmLimit.max);
 	}
 }
 
@@ -528,20 +578,37 @@ function rotateWaist(up) {
 	var axis = new THREE.Vector3(0, 0, 1);
 	var velocity = delta * Math.PI;
 
-	if (up && lowerBody.rotation.z < 0) {
-		lowerBody.rotation.z = THREE.MathUtils.clamp(
+	var lowerLimit = -Math.PI / 2;
+	var upperLimit = 0;
+
+	if (up && lowerBody.rotation.z < upperLimit) {
+		var newRotation = THREE.MathUtils.clamp(
 			lowerBody.rotation.z + velocity,
-			-Math.PI / 2,
-			0
+			lowerLimit,
+			upperLimit
 		);
-		lowerBody.position.sub(pivot).applyAxisAngle(axis, velocity).add(pivot);
-	} else if (!up && lowerBody.rotation.z > -Math.PI / 2) {
-		lowerBody.rotation.z = THREE.MathUtils.clamp(
+
+		var rotationDelta = newRotation - lowerBody.rotation.z;
+
+		lowerBody.rotateOnWorldAxis(axis, rotationDelta);
+		lowerBody.position
+			.sub(pivot)
+			.applyAxisAngle(axis, rotationDelta)
+			.add(pivot);
+	} else if (!up && lowerBody.rotation.z > lowerLimit) {
+		var newRotation = THREE.MathUtils.clamp(
 			lowerBody.rotation.z - velocity,
-			-Math.PI / 2,
-			0
+			lowerLimit,
+			upperLimit
 		);
-		lowerBody.position.sub(pivot).applyAxisAngle(axis, -velocity).add(pivot);
+
+		var rotationDelta = newRotation - lowerBody.rotation.z;
+
+		lowerBody.rotateOnWorldAxis(axis, rotationDelta);
+		lowerBody.position
+			.sub(pivot)
+			.applyAxisAngle(axis, rotationDelta)
+			.add(pivot);
 	}
 }
 
