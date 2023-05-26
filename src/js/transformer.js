@@ -10,6 +10,35 @@ var currentCameraIndex = 0,
 
 var keys = {};
 
+var robot_waist = true;
+var robot_arms = true;
+var robot_head = true;
+var robot_feet = true;
+
+var transformerAABB;
+var trailerAABB;
+
+function is_truck() {
+	"use strict";
+	return !robot_waist && !robot_arms && !robot_head && !robot_feet;
+}
+
+function updateTransformerAABB() {
+	var transformerBox = new THREE.Box3().setFromObject(transformer);
+	var transformerMin = transformerBox.min;
+	var transformerMax = transformerBox.max;
+
+	transformerAABB = new THREE.Box3(transformerMin, transformerMax);
+}
+
+function updateTrailerAABB() {
+	var trailerBox = new THREE.Box3().setFromObject(trailer);
+	var trailerMin = trailerBox.min;
+	var trailerMax = trailerBox.max;
+
+	trailerAABB = new THREE.Box3(trailerMin, trailerMax);
+}
+
 var materials = new Map([
 	["yellow", new THREE.MeshBasicMaterial({ color: 0xffd91c, wireframe: true })],
 	["orange", new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true })],
@@ -431,6 +460,8 @@ function createTransformer(x, y, z) {
 
 	transformer.position.set(x, y, z);
 	scene.add(transformer);
+
+	updateTransformerAABB();
 }
 
 function createTrailer(x, y, z) {
@@ -484,6 +515,8 @@ function createTrailer(x, y, z) {
 	trailer.position.set(x, y, z);
 
 	scene.add(trailer);
+
+	updateTrailerAABB();
 }
 
 function createScene() {
@@ -601,7 +634,7 @@ function rotateHead(up) {
 	var axis = new THREE.Vector3(0, 0, 1);
 	var velocity = delta * Math.PI;
 
-	var lowerLimit = 0 + 0.01; // due to float point imprecision
+	var lowerLimit = 0 + 0.1; // due to float point imprecision
 	var upperLimit = Math.PI;
 
 	if (up && headObject.rotation.z < upperLimit) {
@@ -633,6 +666,14 @@ function rotateHead(up) {
 			.applyAxisAngle(axis, rotationDelta)
 			.add(pivot);
 	}
+
+	if (headObject.rotation.z >= upperLimit) {
+		robot_head = false;
+	} else if (headObject.rotation.z <= lowerLimit) {
+		robot_head = true;
+	}
+
+	updateTransformerAABB();
 }
 
 function rotateFeet(up) {
@@ -666,6 +707,14 @@ function rotateFeet(up) {
 		feet.rotateOnWorldAxis(axis, rotationDelta);
 		feet.position.sub(pivot).applyAxisAngle(axis, rotationDelta).add(pivot);
 	}
+
+	if (feet.rotation.z >= upperLimit - 0.1) {
+		robot_feet = true;
+	} else if (feet.rotation.z <= lowerLimit) {
+		robot_feet = false;
+	}
+
+	updateTransformerAABB();
 }
 
 function moveArms(left) {
@@ -693,6 +742,14 @@ function moveArms(left) {
 		rightArmObject.position.add(velocity);
 		rightArmObject.position.clamp(rightArmLimit.min, rightArmLimit.max);
 	}
+
+	if (leftArmObject.position.equals(leftArmLimit.max)) {
+		robot_arms = false;
+	} else if (leftArmObject.position.equals(leftArmLimit.min)) {
+		robot_arms = true;
+	}
+
+	updateTransformerAABB();
 }
 
 function rotateWaist(up) {
@@ -732,6 +789,14 @@ function rotateWaist(up) {
 			.applyAxisAngle(axis, rotationDelta)
 			.add(pivot);
 	}
+
+	if (lowerBody.rotation.z >= upperLimit - 0.1) {
+		robot_waist = true;
+	} else if (lowerBody.rotation.z <= lowerLimit) {
+		robot_waist = false;
+	}
+
+	updateTransformerAABB();
 }
 
 function moveTrailerZ(left) {
@@ -742,6 +807,8 @@ function moveTrailerZ(left) {
 	} else {
 		trailer.position.sub(velocity);
 	}
+
+	updateTrailerAABB();
 }
 
 function moveTrailerX(left) {
@@ -752,10 +819,41 @@ function moveTrailerX(left) {
 	} else {
 		trailer.position.sub(velocity);
 	}
+
+	updateTrailerAABB();
+}
+
+function isCollision() {
+	return is_truck() && transformerAABB.intersectsBox(trailerAABB);
+}
+
+function handleCollision() {
+	var totalFrames = 20;
+
+	var targetPosition = new THREE.Vector3(-45, 12, 0);
+	var positionIncrement = targetPosition
+		.clone()
+		.sub(trailer.position)
+		.divideScalar(totalFrames);
+
+	renderer.setAnimationLoop(function () {
+		trailer.position.add(positionIncrement);
+
+		var distance = trailer.position.distanceTo(targetPosition);
+		if (distance < 0.1) {
+			trailer.position.copy(targetPosition);
+		}
+
+		renderer.render(scene, cameras[currentCameraIndex]);
+	});
 }
 
 function update() {
 	"use strict";
+
+	if (isCollision()) {
+		handleCollision();
+	}
 
 	if (keys[81] == 1) {
 		console.log("Q");
