@@ -1,5 +1,3 @@
-/*global THREE, requestAnimationFrame, console*/
-
 var cameras = [],
 	scene,
 	renderer,
@@ -18,7 +16,8 @@ var robot_feet = true;
 var transformerAABB;
 var trailerAABB;
 
-var animating = true;
+var animating = false;
+var coupled = false;
 
 function is_truck() {
 	"use strict";
@@ -828,7 +827,8 @@ function isCollision() {
 }
 
 function handleCollision() {
-	var totalFrames = 20;
+	"use strict";
+	var totalFrames = 40;
 
 	var targetPosition = new THREE.Vector3(-45, 12, 0);
 	var positionIncrement = targetPosition
@@ -836,11 +836,19 @@ function handleCollision() {
 		.sub(trailer.position)
 		.divideScalar(totalFrames);
 
+	animating = true;
+
 	renderer.setAnimationLoop(function () {
+		if (!animating) {
+			return;
+		}
+
 		trailer.position.add(positionIncrement);
 
 		var distance = trailer.position.distanceTo(targetPosition);
-		if (distance < 0.1) {
+		if (distance <= 0.1) {
+			coupled = true;
+			animating = false;
 			trailer.position.copy(targetPosition);
 		}
 
@@ -851,11 +859,11 @@ function handleCollision() {
 function update() {
 	"use strict";
 
-	if (isCollision()) {
+	if (isCollision() && !coupled) {
 		handleCollision();
-		animating = true;
-	} else {
-		animating = false;
+		coupled = true;
+	} else if (!isCollision() && coupled) {
+		coupled = false;
 	}
 
 	if (animating) {
