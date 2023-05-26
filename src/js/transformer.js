@@ -624,8 +624,6 @@ function init() {
 	clock = new THREE.Clock();
 	clock.start();
 
-	render();
-
 	window.addEventListener("keydown", onKeyDown);
 	window.addEventListener("keyup", onKeyUp);
 	window.addEventListener("resize", onResize, false);
