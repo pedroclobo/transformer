@@ -18,6 +18,8 @@ var robot_feet = true;
 var transformerAABB;
 var trailerAABB;
 
+var animating = true;
+
 function is_truck() {
 	"use strict";
 	return !robot_waist && !robot_arms && !robot_head && !robot_feet;
@@ -853,6 +855,13 @@ function update() {
 
 	if (isCollision()) {
 		handleCollision();
+		animating = true;
+	} else {
+		animating = false;
+	}
+
+	if (animating) {
+		return;
 	}
 
 	if (keys[81] == 1) {
