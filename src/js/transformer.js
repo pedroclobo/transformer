@@ -47,24 +47,14 @@ function updateTrailerAABB() {
 var materials = new Map([
 	["yellow", new THREE.MeshBasicMaterial({ color: 0xffd91c, wireframe: true })],
 	["orange", new THREE.MeshBasicMaterial({ color: 0xffa010, wireframe: true })],
-	[
-		"darkOrange",
-		new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true }),
-	],
-	["red", new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true })],
-	[
-		"lightBlue",
-		new THREE.MeshBasicMaterial({ color: 0xa8eeff, wireframe: true }),
-	],
+	["darkOrange", new THREE.MeshBasicMaterial({ color: 0xff4000, wireframe: true }),],
+	["red", new THREE.MeshBasicMaterial({ color: 0xc21d11, wireframe: true })], //0xc21d11
+	["darkRed", new THREE.MeshBasicMaterial({ color: 0x9e0000, wireframe: true })], //a8eeff
+	["blue", new THREE.MeshBasicMaterial({ color: 0x2260b3, wireframe: true }),],
+	["lightBlue", new THREE.MeshBasicMaterial({ color: 0x58c3d1, wireframe: true }),],
 	["gray", new THREE.MeshBasicMaterial({ color: 0x7a7a7a, wireframe: true })],
-	[
-		"lightGray",
-		new THREE.MeshBasicMaterial({ color: 0xacacac, wireframe: true }),
-	],
-	[
-		"darkGray",
-		new THREE.MeshBasicMaterial({ color: 0x242424, wireframe: true }),
-	],
+	["lightGray", new THREE.MeshBasicMaterial({ color: 0xacacac, wireframe: true }),],
+	["darkGray", new THREE.MeshBasicMaterial({ color: 0x242424, wireframe: true }),]
 ]);
 
 var geometry, line;
@@ -76,6 +66,8 @@ var headObject,
 	abdomen,
 	leftArmObject,
 	rightArmObject,
+	lHand,
+	rHand,
 	waistObject,
 	legObject;
 
@@ -89,8 +81,8 @@ function createHead(x, y, z) {
 
 	// head
 	head = new THREE.Mesh(
-		new THREE.SphereGeometry(4, 32, 16),
-		materials.get("yellow")
+		new THREE.SphereGeometry(4, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2),
+		materials.get("red")
 	);
 
 	// neck
@@ -115,11 +107,11 @@ function createHead(x, y, z) {
 	// antennas
 	lAntenna = new THREE.Mesh(
 		new THREE.ConeGeometry(1, 3, 16),
-		materials.get("darkOrange")
+		materials.get("gray")
 	);
 	rAntenna = new THREE.Mesh(
 		new THREE.ConeGeometry(1, 3, 16),
-		materials.get("darkOrange")
+		materials.get("gray")
 	);
 	lAntenna.rotation.x = THREE.MathUtils.degToRad(-20);
 	rAntenna.rotation.x = THREE.MathUtils.degToRad(20);
@@ -140,7 +132,7 @@ function createChest(x, y, z) {
 
 	// chest
 	geometry = new THREE.BoxGeometry(18, 16, 24);
-	chest = new THREE.Mesh(geometry, materials.get("red"));
+	chest = new THREE.Mesh(geometry, materials.get("darkRed"));
 	line = new THREE.LineSegments(
 		new THREE.EdgesGeometry(geometry),
 		new THREE.LineBasicMaterial({ color: 0x0 })
@@ -185,31 +177,37 @@ function createAbdomen(x, y, z) {
 
 function createLeftArm(x, y, z) {
 	"use strict";
-	var shoulder, forearm, arm, hand, botExhaust, topExhaust;
+	var shoulder, forearm, arm, botExhaust, topExhaust;
 
 	// shoulder
 	shoulder = new THREE.Mesh(
 		new THREE.BoxGeometry(5, 5, 4),
-		materials.get("darkOrange")
+		materials.get("gray")
 	);
 
 	// forearm
 	forearm = new THREE.Mesh(
 		new THREE.BoxGeometry(5, 14, 4),
-		materials.get("orange")
+		materials.get("red")
 	);
 	forearm.position.set(0, -3.5, -4);
 
 	// arm
 	arm = new THREE.Mesh(
 		new THREE.BoxGeometry(12, 4, 4),
-		materials.get("orange")
+		materials.get("red")
 	);
 	arm.position.set(3.5, -12.5, -4);
 
 	// hand
-	hand = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 4), materials.get("red"));
-	hand.position.set(12.5, -12.5, -4);
+	geometry = new THREE.BoxGeometry(6, 4, 4);
+	lHand = new THREE.Mesh(geometry, materials.get("red"));
+	line = new THREE.LineSegments(
+		new THREE.EdgesGeometry(geometry),
+		new THREE.LineBasicMaterial({ color: 0x0 })
+	);
+	lHand.add(line);
+	lHand.position.set(12.5, -12.5, -4);
 
 	// bot exhaust
 	botExhaust = new THREE.Mesh(
@@ -227,7 +225,7 @@ function createLeftArm(x, y, z) {
 
 	// full arm
 	leftArmObject = new THREE.Object3D();
-	leftArmObject.add(shoulder, forearm, arm, botExhaust, topExhaust, hand);
+	leftArmObject.add(shoulder, forearm, arm, botExhaust, topExhaust, lHand);
 	leftArmObject.position.set(x, y, z);
 
 	return leftArmObject;
@@ -235,31 +233,37 @@ function createLeftArm(x, y, z) {
 
 function createRightArm(x, y, z) {
 	"use strict";
-	var shoulder, forearm, arm, hand, botExhaust, topExhaust;
+	var shoulder, forearm, arm, botExhaust, topExhaust;
 
 	// shoulder
 	shoulder = new THREE.Mesh(
 		new THREE.BoxGeometry(5, 5, 4),
-		materials.get("darkOrange")
+		materials.get("gray")
 	);
 
 	// forearm
 	forearm = new THREE.Mesh(
 		new THREE.BoxGeometry(5, 14, 4),
-		materials.get("orange")
+		materials.get("red")
 	);
 	forearm.position.set(0, -3.5, 4);
 
 	// arm
 	arm = new THREE.Mesh(
 		new THREE.BoxGeometry(12, 4, 4),
-		materials.get("orange")
+		materials.get("red")
 	);
 	arm.position.set(3.5, -12.5, 4);
 
 	// hand
-	hand = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 4), materials.get("red"));
-	hand.position.set(12.5, -12.5, 4);
+	geometry = new THREE.BoxGeometry(6, 4, 4);
+	rHand = new THREE.Mesh(geometry, materials.get("red"));
+	line = new THREE.LineSegments(
+		new THREE.EdgesGeometry(geometry),
+		new THREE.LineBasicMaterial({ color: 0x0 })
+	);
+	rHand.add(line);
+	rHand.position.set(12.5, -12.5, 4);
 
 	// bot exhaust
 	botExhaust = new THREE.Mesh(
@@ -277,7 +281,7 @@ function createRightArm(x, y, z) {
 
 	// full arm
 	rightArmObject = new THREE.Object3D();
-	rightArmObject.add(shoulder, forearm, arm, botExhaust, topExhaust, hand);
+	rightArmObject.add(shoulder, forearm, arm, botExhaust, topExhaust, rHand);
 	rightArmObject.position.set(x, y, z);
 
 	return rightArmObject;
@@ -324,7 +328,7 @@ function createLeftLeg(x, y, z) {
 
 	// thigh
 	geometry = new THREE.BoxGeometry(10, 8, 8);
-	thigh = new THREE.Mesh(geometry, materials.get("red"));
+	thigh = new THREE.Mesh(geometry, materials.get("darkRed"));
 	line = new THREE.LineSegments(
 		new THREE.EdgesGeometry(geometry),
 		new THREE.LineBasicMaterial({ color: 0x0 })
@@ -333,7 +337,7 @@ function createLeftLeg(x, y, z) {
 
 	// leg
 	geometry = new THREE.BoxGeometry(6, 24, 4);
-	leg = new THREE.Mesh(geometry, materials.get("orange"));
+	leg = new THREE.Mesh(geometry, materials.get("gray"));
 	line = new THREE.LineSegments(
 		new THREE.EdgesGeometry(geometry),
 		new THREE.LineBasicMaterial({ color: 0x0 })
@@ -369,7 +373,7 @@ function createRightLeg(x, y, z) {
 
 	// thigh
 	geometry = new THREE.BoxGeometry(10, 8, 8);
-	thigh = new THREE.Mesh(geometry, materials.get("red"));
+	thigh = new THREE.Mesh(geometry, materials.get("darkRed"));
 	line = new THREE.LineSegments(
 		new THREE.EdgesGeometry(geometry),
 		new THREE.LineBasicMaterial({ color: 0x0 })
@@ -378,7 +382,7 @@ function createRightLeg(x, y, z) {
 
 	// leg
 	geometry = new THREE.BoxGeometry(6, 24, 4);
-	leg = new THREE.Mesh(geometry, materials.get("orange"));
+	leg = new THREE.Mesh(geometry, materials.get("gray"));
 	line = new THREE.LineSegments(
 		new THREE.EdgesGeometry(geometry),
 		new THREE.LineBasicMaterial({ color: 0x0 })
@@ -412,7 +416,7 @@ function createLeftFoot(x, y, z) {
 	"use strict";
 	// foot
 	geometry = new THREE.BoxGeometry(8, 4, 8);
-	var lFoot = new THREE.Mesh(geometry, materials.get("red"));
+	var lFoot = new THREE.Mesh(geometry, materials.get("darkRed"));
 	line = new THREE.LineSegments(
 		new THREE.EdgesGeometry(geometry),
 		new THREE.LineBasicMaterial({ color: 0x0 })
@@ -427,7 +431,7 @@ function createRightFoot(x, y, z) {
 	"use strict";
 	// foot
 	geometry = new THREE.BoxGeometry(8, 4, 8);
-	var rFoot = new THREE.Mesh(geometry, materials.get("red"));
+	var rFoot = new THREE.Mesh(geometry, materials.get("darkRed"));
 	line = new THREE.LineSegments(
 		new THREE.EdgesGeometry(geometry),
 		new THREE.LineBasicMaterial({ color: 0x0 })
@@ -475,7 +479,7 @@ function createTrailer(x, y, z) {
 
 	// container
 	geometry = new THREE.BoxGeometry(60, 24, 24);
-	container = new THREE.Mesh(geometry, materials.get("red"));
+	container = new THREE.Mesh(geometry, materials.get("blue"));
 	line = new THREE.LineSegments(
 		new THREE.EdgesGeometry(geometry),
 		new THREE.LineBasicMaterial({ color: 0x0 })
@@ -635,9 +639,9 @@ function init() {
 function rotateHead(up) {
 	var pivot = new THREE.Vector3(-2, 17.4, 0);
 	var axis = new THREE.Vector3(0, 0, 1);
-	var velocity = delta * Math.PI;
+	var velocity = delta * 4;
 
-	var lowerLimit = 0 + 0.1; // due to float point imprecision
+	var lowerLimit = 0;
 	var upperLimit = Math.PI;
 
 	if (up && headObject.rotation.z < upperLimit) {
@@ -753,6 +757,51 @@ function moveArms(left) {
 	}
 
 	updateTransformerAABB();
+}
+
+function rotateHands(up) {
+	var lPivot = new THREE.Vector3(9.5, 0, -2);
+	var rPivot = new THREE.Vector3(9.5, 0, 2);
+	var axis = new THREE.Vector3(0, 1, 0);
+	var velocity = delta * 4;
+
+	var rHandLowerLimit = 0;
+	var rHandUpperLimit = Math.PI / 2;
+	
+	var lHandLowerLimit = -Math.PI / 2;
+	var lHandUpperLimit = 0;
+
+	// Left Hand
+	if (!up && lHand.rotation.y < lHandUpperLimit) {
+		var newRotation = THREE.MathUtils.clamp(lHand.rotation.y + velocity, lHandLowerLimit, lHandUpperLimit);
+		var rotationDelta = newRotation - lHand.rotation.y;
+
+		lHand.rotateOnWorldAxis(axis, rotationDelta);
+		lHand.position.sub(lPivot).applyAxisAngle(axis, rotationDelta).add(lPivot);
+	} 
+	else if (up && lHand.rotation.y > lHandLowerLimit) {
+		var newRotation = THREE.MathUtils.clamp(lHand.rotation.y - velocity, lHandLowerLimit, lHandUpperLimit);
+		var rotationDelta = newRotation - lHand.rotation.y;
+
+		lHand.rotateOnWorldAxis(axis, rotationDelta);
+		lHand.position.sub(lPivot).applyAxisAngle(axis, rotationDelta).add(lPivot);
+	}
+
+	// Right Hand
+	if (up && rHand.rotation.y < rHandUpperLimit) {
+		var newRotation = THREE.MathUtils.clamp(rHand.rotation.y + velocity, rHandLowerLimit, rHandUpperLimit);
+		var rotationDelta = newRotation - rHand.rotation.y;
+
+		rHand.rotateOnWorldAxis(axis, rotationDelta);
+		rHand.position.sub(rPivot).applyAxisAngle(axis, rotationDelta).add(rPivot);
+	} 
+	else if (!up && rHand.rotation.y > rHandLowerLimit) {
+		var newRotation = THREE.MathUtils.clamp(rHand.rotation.y - velocity, rHandLowerLimit, rHandUpperLimit);
+		var rotationDelta = newRotation - rHand.rotation.y;
+
+		rHand.rotateOnWorldAxis(axis, rotationDelta);
+		rHand.position.sub(rPivot).applyAxisAngle(axis, rotationDelta).add(rPivot);
+	}
 }
 
 function rotateWaist(up) {
@@ -904,10 +953,12 @@ function update() {
 	if (keys[69] == 1) {
 		console.log("E");
 		moveArms(true);
+		rotateHands(true);
 	}
 	if (keys[68] == 1) {
 		console.log("D");
 		moveArms(false);
+		rotateHands(false);
 	}
 	if (keys[82] == 1) {
 		console.log("R");
